@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { toast, Toaster } from 'sonner';
-import { Stethoscope, Lock, Mail, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { Stethoscope, Lock, Mail, ChevronLeft, ChevronRight, Quote, User } from 'lucide-react';
 
 const testimonials = [
   {
@@ -198,7 +198,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
               {testimonials.map((_, idx) => (
                 <div 
                   key={idx} 
-                  className={\h-1.5 rounded-full transition-all duration-300 \\} 
+                  className={`h-1.5 rounded-full transition-all duration-300 ${currentTestimonial === idx ? 'w-8 bg-[#95D5B2]' : 'w-2 bg-white/40'}`} 
                 />
               ))}
             </div>

@@ -97,6 +97,14 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   // Global Notifications State
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+  }, []);
+
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'Pamuk için Karma Aşı vakti geldi.', time: '10 dk önce', read: false },
     { id: 2, text: 'Yarın 3 operasyon randevunuz var.', time: '1 saat önce', read: false },
