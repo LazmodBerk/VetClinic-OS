@@ -189,15 +189,15 @@ export function Communication() {
           <h3 className="font-semibold text-gray-900 flex items-center gap-2"><Phone className="h-5 w-5 text-[#25D366]" /> Önizleme & Gönder</h3>
 
           {/* WhatsApp önizleme */}
-          <div className="flex-1 bg-[#e5ddd5] rounded-xl p-3 min-h-[180px]">
-            <div className="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[90%] text-sm">
-              <p className="font-semibold text-[#1B4332] mb-1 text-xs">Klinik</p>
-              <p className="text-gray-800 whitespace-pre-wrap text-xs leading-relaxed">
+          <div className="flex-1 bg-[#e5ddd5] dark:bg-[#0b141a] rounded-xl p-3 min-h-[180px] border border-transparent dark:border-slate-700">
+            <div className="bg-white dark:bg-[#202c33] rounded-lg rounded-tl-none p-3 shadow-sm max-w-[90%] text-sm">
+              <p className="font-semibold text-[#1B4332] dark:text-[#00a884] mb-1 text-xs">Klinik</p>
+              <p className="text-gray-800 dark:text-[#e9edef] whitespace-pre-wrap text-xs leading-relaxed">
                 {selectedTemplate === 'custom'
                   ? (customText || '(Mesajınızı yazın...)')
                   : template.text(recipients[0]?.name || 'Tarçın', recipients[0]?.owner || 'Ahmet Bey')}
               </p>
-              <span className="text-[10px] text-gray-400 mt-1 block text-right">şimdi ✓✓</span>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 block text-right">şimdi ✓✓</span>
             </div>
           </div>
 

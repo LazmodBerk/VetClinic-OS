@@ -250,9 +250,9 @@ export function Patients() {
           </div>
           {/* Önizleme */}
           {owner && (
-            <div className="bg-[#e5ddd5] rounded-xl p-3">
-              <p className="text-xs text-gray-500 mb-1">📱 WhatsApp mesaj önizlemesi:</p>
-              <p className="text-xs text-gray-800">
+            <div className="bg-[#e5ddd5] dark:bg-[#0b141a] rounded-xl p-3 border border-transparent dark:border-slate-700">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">📱 WhatsApp mesaj önizlemesi:</p>
+              <p className="text-xs text-gray-800 dark:text-[#e9edef]">
                 Merhaba {owner} {honorific(ownerGender)},<br />
                 {name || 'Hayvanınız'} ile ilgili bilgilendirme yapmak istiyoruz. 🐾
               </p>
