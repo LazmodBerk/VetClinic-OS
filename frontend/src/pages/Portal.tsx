@@ -7,8 +7,8 @@ import { Modal } from '../components/Modal';
 export function Portal() {
   const { patients, appointments, vaccines, addAppointment } = useAppContext();
   
-  // Assume logged in as "Ahmet Yılmaz"
-  const ownerName = "Ahmet Yılmaz";
+  // Assume logged in as "Mehmet Bey"
+  const ownerName = "Mehmet Bey";
   const myPets = patients.filter(p => p.owner === ownerName);
   const myAppointments = appointments.filter(a => a.owner === ownerName);
   const myVaccines = vaccines.filter(v => v.owner === ownerName);

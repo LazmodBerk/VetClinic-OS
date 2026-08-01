@@ -1,5 +1,6 @@
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Tractor, Smartphone, Home, CheckCircle2, Clock, Brain, Moon, Sun, Globe } from 'lucide-react';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { useState, useRef, useEffect } from 'react';
 import { Dashboard } from './pages/Dashboard';
 import { Appointments } from './pages/Appointments';
@@ -38,8 +39,58 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { theme, toggleTheme } = useAppContext();
+  const { theme, toggleTheme, settings, inventoryItems, vaccines } = useAppContext();
   
+  // Local Notifications Setup
+  useEffect(() => {
+    const setupNotifications = async () => {
+      try {
+        if (!settings.notifyVaccines && !settings.notifyStock) return;
+        
+        await LocalNotifications.requestPermissions();
+        await LocalNotifications.cancel({ notifications: (await LocalNotifications.getPending()).notifications });
+        
+        const pending: any[] = [];
+        let idCounter = 1;
+
+        if (settings.notifyStock) {
+          const criticalStock = inventoryItems.filter(i => i.status === 'Kritik');
+          if (criticalStock.length > 0) {
+            pending.push({
+              id: idCounter++,
+              title: 'Stok Uyarısı',
+              body: `${criticalStock.length} adet ürün kritik stok seviyesinde! Sipariş vermeyi unutmayın.`,
+              schedule: { at: new Date(Date.now() + 1000 * 10) } // Uygulama açıldıktan 10 sn sonra göster
+            });
+          }
+        }
+
+        if (settings.notifyVaccines) {
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const tomorrowStr = tomorrow.toLocaleDateString('tr-TR');
+          
+          const upcoming = vaccines.filter(v => v.date === tomorrowStr);
+          if (upcoming.length > 0) {
+            pending.push({
+              id: idCounter++,
+              title: 'Yaklaşan Aşılar',
+              body: `Yarın yapılması gereken ${upcoming.length} adet aşı randevunuz var. Müşterilerinize hatırlatma gönderebilirsiniz.`,
+              schedule: { at: new Date(Date.now() + 1000 * 15) } // Uygulama açıldıktan 15 sn sonra
+            });
+          }
+        }
+
+        if (pending.length > 0) {
+          await LocalNotifications.schedule({ notifications: pending });
+        }
+      } catch (e) {
+        console.log('Local notifications unsupported on this platform or denied.');
+      }
+    };
+    setupNotifications();
+  }, [settings.notifyVaccines, settings.notifyStock, inventoryItems, vaccines]);
+
   // Global Notifications State
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([
@@ -124,7 +175,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
               Dr
             </div>
             <div>
-              <p className="text-sm font-medium text-white">Ahmet Yılmaz</p>
+              <p className="text-sm font-medium text-white">Dr. Buğra Can Sefer</p>
               <p className="text-xs text-[#95D5B2]">Veteriner Hekim</p>
             </div>
           </div>

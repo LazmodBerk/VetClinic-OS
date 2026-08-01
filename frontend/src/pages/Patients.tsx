@@ -214,7 +214,7 @@ export function Patients() {
             {/* Hasta Sahibi */}
             <div className="col-span-2 sm:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Hasta Sahibi *</label>
-              <input required value={owner} onChange={e => setOwner(e.target.value)} type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" placeholder="Örn: Ahmet Yılmaz" />
+              <input required value={owner} onChange={e => setOwner(e.target.value)} type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" placeholder="Örn: Mehmet Bey" />
             </div>
             {/* Cinsiyet */}
             <div className="col-span-2 sm:col-span-1">

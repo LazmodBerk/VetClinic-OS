@@ -84,6 +84,9 @@ export interface SettingsData {
   address: string;
   taxOffice: string;
   taxNo: string;
+  geminiApiKey?: string;
+  notifyVaccines?: boolean;
+  notifyStock?: boolean;
 }
 
 // ─────────────────────────────────────────────
@@ -135,11 +138,14 @@ const DEFAULT_FARM: FarmAnimal[] = [];
 
 const DEFAULT_SETTINGS: SettingsData = {
   clinicName: 'BulutVet Premium Klinik',
-  phone: '+90 (555) 123 45 67',
+  phone: '0555 123 45 67',
   email: 'info@bulutvet.com',
-  address: 'Veterinerler Sk. No:42 Kadıköy / İstanbul',
-  taxOffice: 'Kadıköy VD',
+  address: 'Örnek Mah. Pet Cad. No:1',
+  taxOffice: 'Kozyatağı',
   taxNo: '1234567890',
+  geminiApiKey: '',
+  notifyVaccines: true,
+  notifyStock: true
 };
 
 // ─────────────────────────────────────────────

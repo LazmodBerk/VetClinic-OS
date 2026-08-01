@@ -199,7 +199,7 @@ export function LandingPage() {
             <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert("Randevu talebiniz alındı."); }}>
               <div>
                 <label className="block text-sm font-medium mb-1">Adınız Soyadınız</label>
-                <input type="text" className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#1B4332] transition-colors bg-transparent" placeholder="Örn: Ahmet Yılmaz" required/>
+                <input type="text" className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#1B4332] transition-colors bg-transparent" placeholder="Örn: Mehmet Bey" required/>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Telefon Numaranız</label>

@@ -9,7 +9,7 @@ interface Message {
 }
 
 export function AiAssistant() {
-  const { patients, appointments, vaccines, inventoryItems, transactions } = useAppContext();
+  const { patients, appointments, vaccines, inventoryItems, transactions, settings } = useAppContext();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -29,7 +29,7 @@ export function AiAssistant() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -43,37 +43,99 @@ export function AiAssistant() {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI thinking and generating a bulleted list response
-    setTimeout(() => {
-      let aiText = '';
-      const lowerInput = input.toLowerCase();
+    if (settings.geminiApiKey) {
+      // Use Gemini API
+      try {
+        const promptContext = `
+        Sen BulutVet Veteriner Kliniği (Dr. Buğra Can Sefer) asistanısın. 
+        Klinikteki sistem verileri:
+        - Hastalar: ${patients.length} adet
+        - Bugünki Randevular: ${appointments.filter(a => a.date === 'Bugün').length} adet
+        - Kritik Stoklar: ${inventoryItems.filter(i => i.status === 'Kritik').map(i => i.name).join(', ')}
+        - Bekleyen Aşılar: ${vaccines.filter(v => v.status === 'Bekliyor').length} adet
+        
+        Kullanıcının sorusuna profesyonel, samimi ve Türkçe cevap ver.
+        Kullanıcının sorusu: ${input}
+        `;
 
-      if (lowerInput.includes('aşı') || lowerInput.includes('stok')) {
-        const criticalCount = inventoryItems.filter(i => i.status === 'Kritik').length;
-        const upcomingVaccines = vaccines.filter(v => v.status === 'Bekliyor' || v.status === 'Planlandı').length;
-        aiText = `Aşı ve stok verilerinizi analiz ettim:\n\n- **Kritik Stoklar:** Sistemde şu an ${criticalCount} adet kritik seviyede ürün bulunuyor.\n- **Bekleyen Aşılar:** Toplam ${upcomingVaccines} adet planlanmış/bekleyen aşı randevunuz var.\n- **Aksiyon Önerisi:** Kritik ürünlerin siparişini en kısa sürede vermeniz operasyonel aksaklıkları önleyecektir.`;
-      } else if (lowerInput.includes('randevu') || lowerInput.includes('hasta')) {
-        const todayCount = appointments.filter(a => a.date === 'Bugün').length;
-        const totalPatients = patients.length;
-        aiText = `Hasta ve randevu yoğunluğunu inceledim:\n\n- **Kayıtlı Hastalar:** Sisteminizde toplam ${totalPatients} hasta bulunuyor.\n- **Bugünkü Randevular:** Bugün için ${todayCount > 0 ? todayCount + ' randevunuz var.' : 'henüz randevunuz görünmüyor.'}\n- **Genel Durum:** Hasta yönetim süreciniz stabil ilerliyor.`;
-      } else if (lowerInput.includes('gelir') || lowerInput.includes('ciro') || lowerInput.includes('muhasebe') || lowerInput.includes('finans')) {
-        const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => {
-          const val = parseFloat(t.amount.replace(/[^0-9.-]+/g, ""));
-          return acc + (isNaN(val) ? 0 : val);
-        }, 0);
-        aiText = `Finansal metriklerinize dair analizim şu şekildedir:\n\n- **Toplam Gelir:** Kaydedilen güncel gelir toplamınız ₺${totalIncome.toLocaleString('tr-TR')} seviyesinde.\n- **Genel Durum:** Gelir-gider akışınız sistem üzerinden aktif şekilde izleniyor.`;
-      } else {
-        aiText = `Sorunuzla ilgili yaptığım genel analiz sonucunda şu bilgileri derledim:\n\n- **Öncelikli Tespit:** İlgili konuda klinik verileriniz stabil görünmektedir.\n- **Sistem Durumu:** Tüm süreçler (hasta kayıt, stok ve finans) normal seyrinde ilerliyor.\n\nDaha detaylı bir analiz isterseniz bana (aşı, stok, hasta, randevu, gelir gibi kelimeler kullanarak) spesifik bir soru sorabilirsiniz!`;
+        const response = await fetch(\`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=\${settings.geminiApiKey}\`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: promptContext }]
+            }]
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error.message || 'API Hatası');
+        }
+
+        const aiResponseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Cevap alınamadı.';
+        
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          role: 'ai',
+          text: aiResponseText
+        }]);
+      } catch (error) {
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          role: 'ai',
+          text: \`Gemini API bağlantısında bir hata oluştu. Lütfen API anahtarınızı (Ayarlar sayfasından) kontrol edin. Hata Detayı: \${error}\`
+        }]);
+      } finally {
+        setIsTyping(false);
       }
+    } else {
+      // Fallback: Enhanced Rule-Based System
+      setTimeout(() => {
+        let aiText = '';
+        const lowerInput = input.toLowerCase();
 
-      const aiResponse: Message = {
-        id: Date.now() + 1,
-        role: 'ai',
-        text: aiText
-      };
-      setMessages(prev => [...prev, aiResponse]);
-      setIsTyping(false);
-    }, 1500);
+        const responses = {
+          asi: [
+            \`Aşı ve stok verilerinizi analiz ettim:\n\n- **Bekleyen Aşılar:** Toplam \${vaccines.filter(v => v.status === 'Bekliyor').length} adet planlanmış aşı randevunuz var.\n- Müşterilere hatırlatma mesajlarını göndermeyi unutmayın!\`,
+            \`Şu anda \${vaccines.filter(v => v.status === 'Bekliyor').length} hastanın aşısı beklemede. Düzenli aşı takibi kliniğin sağlığı için çok önemlidir.\`
+          ],
+          stok: [
+            \`**Kritik Stoklar:** Sistemde şu an \${inventoryItems.filter(i => i.status === 'Kritik').length} adet ürün bitmek üzere.\nLütfen eksikleri tedarikçinize hemen bildirin!\`,
+            \`Stok durumunu taradım. \${inventoryItems.filter(i => i.status === 'Kritik').map(i => i.name).join(', ')} ürünlerinde azalma mevcut.\`
+          ],
+          hasta: [
+            \`Kliniğinizde kayıtlı \${patients.length} hasta bulunuyor. Her şey yolunda görünüyor, iyi çalışmalar!\`,
+            \`Hasta ve randevu durumunuz aktif şekilde işleniyor. Toplam \${patients.length} kayıtlı pet dostumuz var.\`
+          ]
+        };
+
+        if (lowerInput.includes('aşı')) {
+          aiText = responses.asi[Math.floor(Math.random() * responses.asi.length)];
+        } else if (lowerInput.includes('stok')) {
+          aiText = responses.stok[Math.floor(Math.random() * responses.stok.length)];
+        } else if (lowerInput.includes('hasta') || lowerInput.includes('randevu')) {
+          aiText = responses.hasta[Math.floor(Math.random() * responses.hasta.length)];
+        } else {
+          const defaultResponses = [
+            \`Bunu tam olarak anlayamadım ama sistemin genel durumu şu an stabil. Size nasıl daha spesifik yardımcı olabilirim?\`,
+            \`Sisteminizde her şey tıkır tıkır işliyor. Lütfen stok veya hasta raporu gibi kelimeler kullanarak bana sorun.\`,
+            \`Şu anki analizime göre tüm modüller sorunsuz çalışmakta.\`
+          ];
+          aiText = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+        }
+
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          role: 'ai',
+          text: aiText
+        }]);
+        setIsTyping(false);
+      }, 1000);
+    }
   };
 
   return (

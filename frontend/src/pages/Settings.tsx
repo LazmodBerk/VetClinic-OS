@@ -13,7 +13,10 @@ export function Settings() {
     email: settings.email,
     address: settings.address,
     taxOffice: settings.taxOffice,
-    taxNo: settings.taxNo
+    taxNo: settings.taxNo,
+    geminiApiKey: settings.geminiApiKey || '',
+    notifyVaccines: settings.notifyVaccines ?? true,
+    notifyStock: settings.notifyStock ?? true
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -161,18 +164,91 @@ export function Settings() {
               </>
             )}
 
-            {activeTab !== 'genel' && (
-              <div className="text-center py-12">
-                <div className="mx-auto h-12 w-12 text-gray-300 mb-4 flex items-center justify-center">
-                  <Lock className="h-8 w-8" />
+            {activeTab === 'kullanicilar' && (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <h3 className="text-lg font-medium text-gray-900 mb-6 border-b border-gray-100 pb-2">Profil ve Kullanıcılar</h3>
+                <div className="flex items-center gap-6 mb-8">
+                  <div className="h-20 w-20 rounded-full bg-[#1B4332] text-white flex items-center justify-center text-2xl font-bold shadow-lg">
+                    BC
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900">Dr. Buğra Can Sefer</h4>
+                    <p className="text-sm text-gray-500">Sistem Yöneticisi & Başhekim</p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900">Bu Bölüm Kilitli</h3>
+                <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                  <p className="text-sm text-blue-800">Şu anda sistemde tek yetkili kullanıcı <strong>Dr. Buğra Can Sefer</strong> olarak tanımlıdır. Yeni personel ekleme özelliği aktif değildir.</p>
+                </div>
+                
+                <h3 className="text-lg font-medium text-gray-900 mt-10 mb-6 border-b border-gray-100 pb-2">Yapay Zeka (Gemini) Ayarları</h3>
+                <p className="text-sm text-gray-600 mb-4">Gerçek yapay zeka deneyimi için Google Gemini API anahtarınızı girebilirsiniz. Boş bırakırsanız asistan kural tabanlı çalışmaya devam eder.</p>
+                <div>
+                  <label htmlFor="geminiApiKey" className="block text-sm font-medium text-gray-700">Gemini API Anahtarı</label>
+                  <div className="mt-1">
+                    <input 
+                      type="password" 
+                      name="geminiApiKey" 
+                      id="geminiApiKey" 
+                      placeholder="AIzaSy..."
+                      value={formData.geminiApiKey} 
+                      onChange={handleChange}
+                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-[#1B4332] focus:ring-[#1B4332] sm:text-sm py-2 px-3 border" 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'bildirim' && (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <h3 className="text-lg font-medium text-gray-900 mb-6 border-b border-gray-100 pb-2">Bildirim Tercihleri</h3>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Stok Uyarıları</h4>
+                      <p className="text-sm text-gray-500 mt-1">Stok seviyesi kritik olan ürünler için bildirim al (Uygulama açıkken veya arka planda).</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        name="notifyStock"
+                        className="sr-only peer" 
+                        checked={formData.notifyStock} 
+                        onChange={(e) => setFormData({...formData, notifyStock: e.target.checked})} 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1B4332]"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Aşı Hatırlatmaları (24 Saat Önce)</h4>
+                      <p className="text-sm text-gray-500 mt-1">Yaklaşan aşı randevuları için 1 gün önceden bildirim al ve müşteriye WhatsApp'tan mesaj atma fırsatı yakala.</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        name="notifyVaccines"
+                        className="sr-only peer" 
+                        checked={formData.notifyVaccines} 
+                        onChange={(e) => setFormData({...formData, notifyVaccines: e.target.checked})} 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1B4332]"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {(activeTab === 'guvenlik' || activeTab === 'yedekleme') && (
+              <div className="text-center py-12 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="mx-auto h-12 w-12 text-gray-300 mb-4 flex items-center justify-center">
+                  <Database className="h-8 w-8" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900">Çok Yakında</h3>
                 <p className="mt-2 text-sm text-gray-500">
-                  Şu anda demo sürümünü kullanıyorsunuz. Yönetici yetkileri veya lisans yükseltmesi gerekmektedir.
+                  Güvenlik, lisans ve yedekleme özellikleri BulutVet'in bir sonraki sürümünde aktif edilecektir.
                 </p>
-                <button onClick={() => setActiveTab('genel')} className="mt-6 text-sm font-semibold text-[#1B4332] hover:text-[#122c21]">
-                  &larr; Genel Ayarlara Dön
-                </button>
               </div>
             )}
 
