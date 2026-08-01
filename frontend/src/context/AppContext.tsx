@@ -191,11 +191,28 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
           supabase.from('settings').select('*').eq('user_id', userId).single()
         ]);
 
-        if (pts) setPatients(pts);
+        if (pts) {
+          setPatients(pts.map((pt: any) => ({
+            ...pt,
+            ownerGender: pt.owner_gender,
+            lastVisit: pt.last_visit,
+            medicalInfo: pt.medical_info
+          })));
+        }
         if (aPts) setAppointments(aPts);
         if (vcs) setVaccines(vcs);
-        if (inv) setInventoryItems(inv);
-        if (txs) setTransactions(txs);
+        if (inv) {
+          setInventoryItems(inv.map((i: any) => ({
+            ...i,
+            minStock: i.min_stock
+          })));
+        }
+        if (txs) {
+          setTransactions(txs.map((t: any) => ({
+            ...t,
+            eInvoice: t.e_invoice
+          })));
+        }
         if (sets) {
           setSettings({
             clinicName: sets.clinic_name || DEFAULT_SETTINGS.clinicName,
@@ -222,14 +239,55 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
   const addPatient = async (p: Omit<Patient, 'id'>) => {
     const userId = getUserId(); 
     if (!userId) throw new Error('Oturum süresi dolmuş, lütfen tekrar giriş yapın.');
-    const { data, error } = await supabase.from('patients').insert([{ ...p, user_id: userId }]).select().single();
+    
+    const payload = {
+      name: p.name,
+      species: p.species,
+      breed: p.breed,
+      age: p.age,
+      owner: p.owner,
+      phone: p.phone,
+      owner_gender: p.ownerGender,
+      last_visit: p.lastVisit,
+      weight: p.weight,
+      status: p.status,
+      user_id: userId
+    };
+
+    const { data, error } = await supabase.from('patients').insert([payload]).select().single();
     if (error) throw new Error(error.message);
-    if (data) setPatients(prev => [data, ...prev]);
+    if (data) {
+      setPatients(prev => [{
+        ...data,
+        ownerGender: data.owner_gender,
+        lastVisit: data.last_visit,
+        medicalInfo: data.medical_info
+      }, ...prev]);
+    }
   };
 
   const updatePatient = async (p: Patient) => {
-    const { data, error } = await supabase.from('patients').update(p).eq('id', p.id).select().single();
-    if (data && !error) setPatients(prev => prev.map(pt => pt.id === p.id ? data : pt));
+    const payload = {
+      name: p.name,
+      species: p.species,
+      breed: p.breed,
+      age: p.age,
+      owner: p.owner,
+      phone: p.phone,
+      owner_gender: p.ownerGender,
+      last_visit: p.lastVisit,
+      weight: p.weight,
+      status: p.status,
+    };
+    const { data, error } = await supabase.from('patients').update(payload).eq('id', p.id).select().single();
+    if (data && !error) {
+      setPatients(prev => prev.map(pt => pt.id === p.id ? {
+        ...data,
+        ownerGender: data.owner_gender,
+        lastVisit: data.last_visit,
+        medicalInfo: data.medical_info
+      } : pt));
+    }
   };
 
   const deletePatient = async (id: string | number) => {
@@ -266,14 +324,36 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
   const addInventoryItem = async (i: Omit<InventoryItem, 'id'>) => {
     const userId = getUserId(); 
     if (!userId) throw new Error('Oturum süresi dolmuş.');
-    const { data, error } = await supabase.from('inventory').insert([{ ...i, user_id: userId }]).select().single();
+    const payload = {
+      name: i.name,
+      category: i.category,
+      stock: i.stock,
+      min_stock: i.minStock,
+      unit: i.unit,
+      price: i.price,
+      status: i.status,
+      user_id: userId
+    };
+    const { data, error } = await supabase.from('inventory').insert([payload]).select().single();
     if (error) throw new Error(error.message);
-    if (data) setInventoryItems(prev => [data, ...prev]);
+    if (data) {
+      setPatients(prev => prev); // dummy
+      setInventoryItems(prev => [{ ...data, minStock: data.min_stock }, ...prev]);
+    }
   };
 
   const updateInventoryItem = async (i: InventoryItem) => {
-    const { data, error } = await supabase.from('inventory').update(i).eq('id', i.id).select().single();
-    if (data && !error) setInventoryItems(prev => prev.map(item => item.id === i.id ? data : item));
+    const payload = {
+      name: i.name,
+      category: i.category,
+      stock: i.stock,
+      min_stock: i.minStock,
+      unit: i.unit,
+      price: i.price,
+      status: i.status
+    };
+    const { data, error } = await supabase.from('inventory').update(payload).eq('id', i.id).select().single();
+    if (data && !error) setInventoryItems(prev => prev.map(item => item.id === i.id ? { ...data, minStock: data.min_stock } : item));
   };
 
   const deleteInventoryItem = async (id: string | number) => {
@@ -284,9 +364,18 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
   const addTransaction = async (t: Omit<Transaction, 'id'>) => {
     const userId = getUserId(); 
     if (!userId) throw new Error('Oturum süresi dolmuş.');
-    const { data, error } = await supabase.from('transactions').insert([{ ...t, user_id: userId }]).select().single();
+    const payload = {
+      type: t.type,
+      amount: t.amount,
+      description: t.description,
+      date: t.date,
+      method: t.method,
+      e_invoice: t.eInvoice,
+      user_id: userId
+    };
+    const { data, error } = await supabase.from('transactions').insert([payload]).select().single();
     if (error) throw new Error(error.message);
-    if (data) setTransactions(prev => [data, ...prev]);
+    if (data) setTransactions(prev => [{ ...data, eInvoice: data.e_invoice }, ...prev]);
   };
 
   const addFarmAnimal = async (f: Omit<FarmAnimal, 'id'>) => {
