@@ -7,26 +7,70 @@ import { Modal } from '../components/Modal';
 export function Portal() {
   const { patients, appointments, vaccines, addAppointment } = useAppContext();
   
-  // Assume logged in as "Mehmet Bey"
-  const ownerName = "Mehmet Bey";
-  const myPets = patients.filter(p => p.owner === ownerName);
-  const myAppointments = appointments.filter(a => a.owner === ownerName);
-  const myVaccines = vaccines.filter(v => v.owner === ownerName);
+  const [loggedInOwner, setLoggedInOwner] = useState<string | null>(null);
 
   // Modals States
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [isPetProfileModalOpen, setIsPetProfileModalOpen] = useState(false);
-  const [selectedPet, setSelectedPet] = useState<typeof myPets[0] | null>(null);
+  const [selectedPet, setSelectedPet] = useState<any | null>(null);
   
   const [isTeleHealthModalOpen, setIsTeleHealthModalOpen] = useState(false);
   const [isVaccineHistoryModalOpen, setIsVaccineHistoryModalOpen] = useState(false);
   
+  // Computed Data for logged in user
+  const myPets = patients.filter(p => p.owner === loggedInOwner);
+  const myAppointments = appointments.filter(a => a.owner === loggedInOwner);
+  const myVaccines = vaccines.filter(v => v.owner === loggedInOwner);
+
   const [appointmentForm, setAppointmentForm] = useState({
-    patient: myPets.length > 0 ? myPets[0].name : '',
+    patient: '',
     date: '',
     time: '',
     type: 'Muayene'
   });
+
+  const uniqueOwners = Array.from(new Set(patients.map(p => p.owner))).filter(Boolean);
+
+  if (!loggedInOwner) {
+    return (
+      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center p-4 selection:bg-[#95D5B2] selection:text-[#1B4332]">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 animate-in zoom-in-95 duration-500">
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="h-16 w-16 bg-[#1B4332] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-[#1B4332]/30">
+              <span className="text-white font-serif font-bold text-3xl">B</span>
+            </div>
+            <h1 className="text-3xl font-serif font-bold text-[#1B4332]">CanVet Portal</h1>
+            <p className="text-gray-500 mt-2 text-sm">Hayvanınızın sağlık verilerine erişmek için lütfen profilinizi seçin.</p>
+          </div>
+          
+          <div className="space-y-3 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+            {uniqueOwners.length > 0 ? (
+              uniqueOwners.map((owner, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setLoggedInOwner(owner);
+                    toast.success(`Hoş geldiniz, ${owner}`);
+                  }}
+                  className="w-full text-left flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:border-[#95D5B2] hover:bg-[#95D5B2]/10 transition-all group"
+                >
+                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-[#1B4332] group-hover:bg-[#1B4332] group-hover:text-white transition-colors">
+                    <LogOut className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900 group-hover:text-[#1B4332] transition-colors">{owner}</p>
+                    <p className="text-xs text-gray-500">{patients.filter(p => p.owner === owner).length} Kayıtlı Hayvan</p>
+                  </div>
+                </button>
+              ))
+            ) : (
+              <p className="text-center text-sm text-gray-500 py-4">Sistemde henüz kayıtlı hasta bulunmuyor.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleBookAppointment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +81,7 @@ export function Portal() {
 
     addAppointment({
       patient: appointmentForm.patient,
-      owner: ownerName,
+      owner: loggedInOwner,
       type: appointmentForm.type,
       date: appointmentForm.date,
       time: appointmentForm.time,
@@ -77,7 +121,7 @@ export function Portal() {
             <span className="text-2xl font-serif font-bold text-[#1B4332]">CanVet.</span>
             <span className="ml-4 pl-4 border-l border-gray-300 text-sm font-medium text-gray-500 hidden sm:block">Hasta Portalı</span>
           </div>
-          <button onClick={() => toast.success('Başarıyla çıkış yapıldı.')} className="flex items-center text-sm font-bold text-[#1B4332] hover:text-[#2a5a45] transition-colors border-b-2 border-transparent hover:border-[#95D5B2] pb-1">
+          <button onClick={() => { setLoggedInOwner(null); toast.success('Başarıyla çıkış yapıldı.'); }} className="flex items-center text-sm font-bold text-[#1B4332] hover:text-[#2a5a45] transition-colors border-b-2 border-transparent hover:border-[#95D5B2] pb-1">
             <LogOut className="h-4 w-4 mr-1.5" />
             Çıkış Yap
           </button>
@@ -94,7 +138,7 @@ export function Portal() {
           
           <div className="relative z-10 max-w-2xl">
             <p className="text-[#95D5B2] font-semibold tracking-wider text-sm uppercase mb-3">Tekrar Hoş Geldiniz</p>
-            <h1 className="text-4xl sm:text-5xl font-serif font-bold mb-4 leading-tight">Merhaba, {ownerName}</h1>
+            <h1 className="text-4xl sm:text-5xl font-serif font-bold mb-4 leading-tight">Merhaba, {loggedInOwner}</h1>
             <p className="text-gray-300 text-lg max-w-xl leading-relaxed">
               CanVet Müşteri Portalı'ndan can dostlarınızın sağlık durumunu takip edebilir, raporlarınızı görüntüleyebilir ve hızlıca randevu alabilirsiniz.
             </p>
@@ -249,6 +293,7 @@ export function Portal() {
               value={appointmentForm.patient}
               onChange={(e) => setAppointmentForm({ ...appointmentForm, patient: e.target.value })}
             >
+              <option value="" disabled>Seçiniz</option>
               {myPets.map(p => (
                 <option key={p.id} value={p.name}>{p.name}</option>
               ))}
