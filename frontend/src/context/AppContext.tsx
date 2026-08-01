@@ -21,6 +21,7 @@ export interface Patient {
     gender: string;
     bloodType: string;
     allergies: string;
+    documents?: { id: string; name: string; dataUrl: string; type: string; date: string; size: number }[];
   };
   notes?: { id: number; date: string; title: string; content: string }[];
 }

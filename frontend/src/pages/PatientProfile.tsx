@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { ArrowLeft, Edit, Calendar, Syringe, FileText, Clock, AlertTriangle, Phone, Mail, MapPin } from 'lucide-react';
+import { ArrowLeft, Edit, Calendar, Syringe, FileText, Clock, AlertTriangle, Phone, Mail, MapPin, Paperclip, Upload, Trash2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function PatientProfile() {
@@ -9,7 +9,7 @@ export function PatientProfile() {
   const navigate = useNavigate();
   const { patients, appointments, vaccines, updatePatient } = useAppContext();
   
-  const [activeTab, setActiveTab] = useState<'appointments' | 'vaccines' | 'notes'>('appointments');
+  const [activeTab, setActiveTab] = useState<'appointments' | 'vaccines' | 'notes' | 'documents'>('appointments');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [noteTitle, setNoteTitle] = useState('');
@@ -66,6 +66,61 @@ export function PatientProfile() {
     setIsNoteModalOpen(false);
     setNoteTitle('');
     setNoteContent('');
+  };
+
+  // Document Handlers
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 500 * 1024) {
+      toast.error('Dosya boyutu 500 KB limitini aşıyor. Lütfen daha küçük bir dosya seçin.');
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      const newDoc = {
+        id: Date.now().toString(),
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        date: new Date().toLocaleDateString('tr-TR'),
+        dataUrl
+      };
+
+      const currentMedicalInfo = patient.medicalInfo || { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '' };
+      const currentDocs = (currentMedicalInfo as any).documents || [];
+
+      updatePatient({
+        ...patient,
+        medicalInfo: {
+          ...currentMedicalInfo,
+          documents: [...currentDocs, newDoc]
+        }
+      });
+      toast.success('Belge başarıyla yüklendi.');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleDeleteDocument = (docId: string) => {
+    if (!confirm('Bu belgeyi silmek istediğinize emin misiniz?')) return;
+    const currentMedicalInfo = patient.medicalInfo;
+    if (!currentMedicalInfo) return;
+    const currentDocs = (currentMedicalInfo as any).documents || [];
+
+    updatePatient({
+      ...patient,
+      medicalInfo: {
+        ...currentMedicalInfo,
+        documents: currentDocs.filter((d: any) => d.id !== docId)
+      }
+    });
+    toast.success('Belge silindi.');
   };
 
   // Filter related data
@@ -200,6 +255,12 @@ export function PatientProfile() {
               >
                 <FileText className="h-4 w-4" /> Tedavi Notları
               </button>
+              <button 
+                onClick={() => setActiveTab('documents')}
+                className={`flex-1 py-4 px-6 text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${activeTab === 'documents' ? 'text-[#1B4332] border-b-2 border-blue-600 bg-blue-50/50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+              >
+                <Paperclip className="h-4 w-4" /> Belgeler
+              </button>
             </div>
 
             <div className="p-6 flex-1 bg-slate-50/30">
@@ -275,6 +336,63 @@ export function PatientProfile() {
                   <button onClick={() => setIsNoteModalOpen(true)} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-semibold hover:border-blue-400 hover:text-[#1B4332] transition-colors flex items-center justify-center gap-2">
                     + Yeni Tedavi Notu Ekle
                   </button>
+                </div>
+              )}
+
+              {activeTab === 'documents' && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  {/* Yükleme Alanı */}
+                  <div className="bg-white p-6 rounded-3xl border border-dashed border-[#95D5B2] bg-[#f2fbf6] flex flex-col items-center justify-center text-center transition-colors hover:border-[#1B4332]">
+                    <div className="h-12 w-12 rounded-full bg-[#1B4332]/10 flex items-center justify-center text-[#1B4332] mb-3">
+                      <Upload className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-900">Belge veya Fotoğraf Yükle</h3>
+                    <p className="text-xs text-gray-500 mt-1 mb-4 max-w-sm">
+                      Laboratuvar sonuçları, röntgenler veya reçeteleri yükleyebilirsiniz (Maks. 500 KB, sadece resim ve PDF).
+                    </p>
+                    <label className="cursor-pointer bg-[#1B4332] text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-[#122c21] transition-colors shadow-sm">
+                      Dosya Seç
+                      <input 
+                        type="file" 
+                        accept="image/*,application/pdf"
+                        className="hidden" 
+                        onChange={handleFileUpload} 
+                      />
+                    </label>
+                  </div>
+
+                  {/* Yüklenen Belgeler */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-gray-900">Kayıtlı Belgeler</h4>
+                    {(!patient.medicalInfo || !(patient.medicalInfo as any).documents || (patient.medicalInfo as any).documents.length === 0) ? (
+                      <p className="text-sm text-gray-500 italic py-4">Henüz yüklenmiş belge bulunmamaktadır.</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {(patient.medicalInfo as any).documents.map((doc: any) => (
+                          <div key={doc.id} className="bg-white p-4 rounded-2xl border border-gray-100 flex items-start gap-4 shadow-sm group hover:border-[#95D5B2] transition-colors">
+                            <div className="bg-gray-50 p-3 rounded-lg text-gray-500 flex-shrink-0 group-hover:bg-[#95D5B2]/20 group-hover:text-[#1B4332] transition-colors">
+                              <FileText className="h-6 w-6" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 truncate" title={doc.name}>{doc.name}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-gray-400">{doc.date}</span>
+                                <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{(doc.size / 1024).toFixed(1)} KB</span>
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <a href={doc.dataUrl} download={doc.name} className="p-1.5 text-gray-400 hover:text-[#1B4332] hover:bg-green-50 rounded-lg transition-colors" title="İndir / Görüntüle">
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
+                              <button onClick={() => handleDeleteDocument(doc.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Sil">
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
