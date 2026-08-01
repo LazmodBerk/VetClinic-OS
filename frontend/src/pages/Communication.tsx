@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Send, MessageCircle, Bell, Users, Syringe, Calendar, Phone } from 'lucide-react';
+import { Send, MessageCircle, Users, Phone } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext, honorific } from '../context/AppContext';
 
 function formatPhone(phone: string): string {
   const d = phone.replace(/\D/g, '');

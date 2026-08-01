@@ -14,7 +14,7 @@ export function PatientProfile() {
   
   const patient = patients.find(p => p.id === Number(id));
   const [editFormData, setEditFormData] = useState(patient || {
-    id: 0, name: '', species: '', breed: '', owner: '', lastVisit: '', weight: '', status: ''
+    id: 0, name: '', species: '', breed: '', owner: '', ownerGender: 'bay' as const, lastVisit: '', weight: '', status: ''
   });
 
   if (!patient) {
