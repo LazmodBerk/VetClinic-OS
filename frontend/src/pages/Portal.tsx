@@ -49,11 +49,11 @@ export function Portal() {
     setIsAppointmentModalOpen(false);
   };
 
-  const cancelAppointment = (id: number) => {
+  const cancelAppointment = (id: number | string) => {
     toast.success('Randevu iptal talebiniz kliniğe iletildi.');
   };
 
-  const downloadReport = (id: number) => {
+  const downloadReport = (id: number | string) => {
     toast.success('Rapor PDF olarak indiriliyor...');
     setTimeout(() => {
       toast.info('İndirme tamamlandı.');

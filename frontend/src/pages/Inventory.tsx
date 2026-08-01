@@ -13,7 +13,7 @@ export function Inventory() {
   const [filterMode, setFilterMode] = useState<'all'|'critical'|'orders'>('all');
 
   // Form states
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | string | null>(null);
   const [name, setName] = useState('');
   const [category, setCategory] = useState('İlaçlar');
   const [stock, setStock] = useState('');
@@ -76,7 +76,7 @@ export function Inventory() {
     resetForm();
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: number | string) => {
     if (window.confirm('Bu ürünü silmek istediğinize emin misiniz?')) {
       deleteInventoryItem(id);
       toast.success('Ürün stoktan silindi.');

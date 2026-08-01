@@ -24,7 +24,7 @@ export function Patients() {
   const { patients, addPatient, deletePatient } = useAppContext();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<number | string | null>(null);
   const [search, setSearch] = useState('');
 
   // Form State

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { Stethoscope, Lock, Mail, User } from 'lucide-react';
 
 export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
@@ -34,6 +34,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <Toaster position="top-center" richColors />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="h-16 w-16 bg-[#1B4332] rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-6 transition-transform">

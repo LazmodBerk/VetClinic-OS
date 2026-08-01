@@ -21,7 +21,7 @@ function openWhatsApp(phone: string | undefined, message: string) {
 export function Appointments() {
   const { appointments, addAppointment, patients, addTransaction } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<number | string | null>(null);
 
   const [patientName, setPatientName] = useState('');
   const [type, setType] = useState('Muayene');
