@@ -27,6 +27,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   useEffect(() => {
@@ -43,7 +44,14 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     e.preventDefault();
     setLoading(true);
     try {
-      if (isLogin) {
+      if (isForgotPassword) {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/settings',
+        });
+        if (error) throw error;
+        toast.success('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.');
+        setIsForgotPassword(false);
+      } else if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success('Giriş başarılı! Kliniğinize yönlendiriliyorsunuz...');
@@ -128,55 +136,65 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
           </div>
           
           <h2 className="text-2xl font-black text-black">
-            {isLogin ? 'Kliniğinize giriş yapın' : 'Yeni klinik hesabı oluşturun'}
+            {isForgotPassword ? 'Şifrenizi Sıfırlayın' : (isLogin ? 'Kliniğinize giriş yapın' : 'Yeni klinik hesabı oluşturun')}
           </h2>
-          <p className="mt-2 text-sm text-gray-800 font-bold">
-            {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
-            <button onClick={() => setIsLogin(!isLogin)} className="font-bold text-[#1B4332] hover:text-[#2a5a45] ml-1 transition-colors underline decoration-2 underline-offset-4">
-              {isLogin ? 'Ücretsiz Kayıt Olun' : 'Buradan Giriş Yapın'}
-            </button>
+          <p className="mt-2 text-sm text-gray-600 font-semibold mb-8">
+            {isForgotPassword 
+              ? 'Kayıtlı e-posta adresinize bir sıfırlama bağlantısı göndereceğiz.' 
+              : 'Güvenli ve bulut tabanlı veteriner yönetim sistemi.'}
           </p>
 
-          <div className="mt-10">
-            <form className="space-y-6" onSubmit={handleAuth}>
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-black text-black mb-2">İsim Soyisim</label>
-                  <div className="relative rounded-xl shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-500" />
-                    </div>
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
-                      placeholder="Dr. Ad Soyad"
-                    />
-                  </div>
-                </div>
-              )}
-              
+          <form className="space-y-6" onSubmit={handleAuth}>
+            {!isLogin && !isForgotPassword && (
               <div>
-                <label className="block text-sm font-black text-black mb-2">E-Posta Adresi</label>
+                <label className="block text-sm font-black text-black mb-2">İsim Soyisim</label>
                 <div className="relative rounded-xl shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-500" />
+                    <User className="h-5 w-5 text-gray-500" />
                   </div>
                   <input
-                    type="email"
+                    type="text"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
-                    placeholder="ornek@klinik.com"
+                    placeholder="Dr. Ad Soyad"
                   />
                 </div>
               </div>
+            )}
+            
+            <div>
+              <label className="block text-sm font-black text-black mb-2">E-Posta Adresi</label>
+              <div className="relative rounded-xl shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-500" />
+                </div>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
+                  placeholder="ornek@klinik.com"
+                />
+              </div>
+            </div>
 
+            {!isForgotPassword && (
               <div>
-                <label className="block text-sm font-black text-black mb-2">Şifre</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-black text-black">Şifre</label>
+                  {isLogin && (
+                    <button 
+                      type="button"
+                      onClick={() => setIsForgotPassword(true)}
+                      className="text-sm font-bold text-[#1B4332] hover:text-[#2a5a45] hover:underline"
+                    >
+                      Şifremi unuttum
+                    </button>
+                  )}
+                </div>
                 <div className="relative rounded-xl shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-500" />
@@ -191,18 +209,41 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                   />
                 </div>
               </div>
+            )}
 
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-[0_4px_14px_0_rgba(27,67,50,0.39)] text-sm font-bold text-white bg-[#1B4332] hover:bg-[#122c21] hover:shadow-[0_6px_20px_rgba(27,67,50,0.23)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4332] transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-[0_4px_14px_0_rgba(27,67,50,0.39)] text-sm font-bold text-white bg-[#1B4332] hover:bg-[#122c21] hover:shadow-[0_6px_20px_rgba(27,67,50,0.23)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4332] transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+              >
+                {loading ? 'İşleniyor...' : (isForgotPassword ? 'Sıfırlama Bağlantısı Gönder' : (isLogin ? 'Güvenli Giriş Yap' : 'Klinik Hesabı Oluştur'))}
+              </button>
+            </div>
+          </form>
+
+          {/* Toggle Button for Login/Register */}
+          <div className="mt-8 pt-6 border-t border-gray-200/60 text-center">
+            {isForgotPassword ? (
+              <button 
+                onClick={() => setIsForgotPassword(false)} 
+                className="text-sm font-bold text-gray-700 hover:text-black transition-colors"
+              >
+                ← Giriş Ekranına Dön
+              </button>
+            ) : (
+              <p className="text-sm text-gray-800 font-bold">
+                {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
+                <button 
+                  onClick={() => setIsLogin(!isLogin)} 
+                  className="font-black text-[#1B4332] hover:text-[#2a5a45] ml-2 transition-colors underline decoration-2 underline-offset-4"
                 >
-                  {loading ? 'İşleniyor...' : (isLogin ? 'Güvenli Giriş Yap' : 'Klinik Hesabı Oluştur')}
+                  {isLogin ? 'Ücretsiz Kayıt Olun' : 'Buradan Giriş Yapın'}
                 </button>
-              </div>
-            </form>
+              </p>
+            )}
           </div>
+
         </div>
       </div>
     </div>
