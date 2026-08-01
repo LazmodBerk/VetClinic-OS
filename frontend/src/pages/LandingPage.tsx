@@ -21,6 +21,9 @@ export function LandingPage() {
           <a href="#hizmetler" className="hover:text-[#1B4332] transition-colors">Hizmetlerimiz</a>
           <a href="#hekimler" className="hover:text-[#1B4332] transition-colors">Hekimlerimiz</a>
           <a href="#iletisim" className="hover:text-[#1B4332] transition-colors">İletişim</a>
+          <button onClick={() => navigate('/')} className="font-semibold text-white bg-[#1B4332] hover:bg-[#122c21] px-4 py-2 rounded-lg transition-all ml-2 flex items-center gap-2">
+            Klinik Paneline Dön <ArrowRight className="h-4 w-4" />
+          </button>
           <button onClick={() => navigate('/portal')} className="font-semibold text-[#1B4332] border-b-2 border-[#95D5B2] hover:border-[#1B4332] pb-1 transition-all">
             Hasta Portalı Girişi
           </button>
@@ -207,7 +210,7 @@ export function LandingPage() {
           <div className="flex gap-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition-colors">Gizlilik Politikası</a>
             <a href="#" className="hover:text-white transition-colors">Kullanım Şartları</a>
-            <button onClick={() => navigate('/login')} className="hover:text-white transition-colors border-l border-gray-700 pl-6 ml-2">Personel Girişi</button>
+            <button onClick={() => navigate('/')} className="hover:text-white transition-colors border-l border-gray-700 pl-6 ml-2">Klinik Paneline (Dashboard) Dön</button>
           </div>
         </div>
       </footer>
