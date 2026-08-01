@@ -1,128 +1,265 @@
-import React from 'react';
-import { Search, Send, MessageSquare, MessageCircle, Bell, History, ArrowRight, AlertTriangle, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { Send, MessageCircle, Bell, Users, Syringe, Calendar, Phone } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAppContext } from '../context/AppContext';
+
+function formatPhone(phone: string): string {
+  const d = phone.replace(/\D/g, '');
+  if (d.startsWith('90')) return d;
+  if (d.startsWith('0')) return '90' + d.slice(1);
+  if (d.startsWith('5')) return '90' + d;
+  return d;
+}
+
+function openWhatsApp(phone: string, message: string) {
+  window.open(`https://wa.me/${formatPhone(phone)}?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+const TEMPLATES = [
+  {
+    id: 'appointment',
+    icon: '📅',
+    label: 'Randevu Hatırlatıcısı',
+    color: 'bg-blue-50 border-blue-200 text-blue-700',
+    text: (name: string, owner: string) =>
+      `Merhaba ${owner} Hanım/Bey,\n${name} için randevunuz yaklaşıyor. Kliniğimizde görüşmek üzere! 🐾`,
+  },
+  {
+    id: 'vaccine',
+    icon: '💉',
+    label: 'Aşı Hatırlatıcısı',
+    color: 'bg-purple-50 border-purple-200 text-purple-700',
+    text: (name: string, owner: string) =>
+      `Merhaba ${owner} Hanım/Bey,\n${name} adlı dostunuzun aşı zamanı yaklaşıyor. Lütfen kliniğimizle iletişime geçiniz. 🐾`,
+  },
+  {
+    id: 'checkup',
+    icon: '🩺',
+    label: 'Kontrol Zamanı',
+    color: 'bg-green-50 border-green-200 text-green-700',
+    text: (name: string, owner: string) =>
+      `Merhaba ${owner} Hanım/Bey,\n${name} için periyodik kontrol zamanı geldi. Sağlığı için muayene yaptırmanızı öneririz. 🐾`,
+  },
+  {
+    id: 'custom',
+    icon: '✏️',
+    label: 'Özel Mesaj',
+    color: 'bg-gray-50 border-gray-200 text-gray-700',
+    text: () => '',
+  },
+];
 
 export function Communication() {
+  const { patients, appointments, vaccines } = useAppContext();
+  const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATES[0].id);
+  const [customText, setCustomText] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState<'all' | 'treatment' | 'vaccine_due' | 'appointment_tomorrow'>('all');
+  const [sentCount, setSentCount] = useState(0);
+
+  const template = TEMPLATES.find(t => t.id === selectedTemplate)!;
+
+  // Müşteri gruplarını belirle
+  const groups: Record<string, typeof patients> = {
+    all: patients.filter(p => p.phone),
+    treatment: patients.filter(p => p.phone && p.status === 'Tedavide'),
+    vaccine_due: patients.filter(p => {
+      const v = vaccines.find(v => v.patient === p.name && v.status === 'Gecikmiş');
+      return p.phone && !!v;
+    }),
+    appointment_tomorrow: patients.filter(p => {
+      const a = appointments.find(a => a.patient === p.name && a.date === 'Yarın');
+      return p.phone && !!a;
+    }),
+  };
+
+  const recipients = groups[selectedGroup];
+
+  function buildMessage(patient: typeof patients[0]) {
+    if (selectedTemplate === 'custom') return customText;
+    return template.text(patient.name, patient.owner);
+  }
+
+  function sendToAll() {
+    if (recipients.length === 0) {
+      toast.error('Bu grupta telefon numarası kayıtlı müşteri yok.');
+      return;
+    }
+    if (selectedTemplate === 'custom' && !customText.trim()) {
+      toast.error('Lütfen mesaj yazın.');
+      return;
+    }
+
+    let count = 0;
+    recipients.forEach((p, i) => {
+      setTimeout(() => {
+        openWhatsApp(p.phone ?? '', buildMessage(p));
+        count++;
+        if (count === recipients.length) {
+          setSentCount(prev => prev + count);
+          toast.success(`${count} kişiye WhatsApp açıldı! Her birinde "Gönder" butonuna basmanız yeterli.`);
+        }
+      }, i * 800); // Her pencereyi 0.8s arayla aç (tarayıcı popup engelini aş)
+    });
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight text-gray-900">İletişim & Mesajlaşma</h2>
+        <p className="mt-1 text-sm text-gray-500">Müşterilerinize WhatsApp üzerinden tek tıkla mesaj gönderin — sunucu gerekmez.</p>
+      </div>
+
+      {/* Nasıl çalışır banner */}
+      <div className="bg-gradient-to-r from-[#25D366]/10 to-green-50 border border-[#25D366]/30 rounded-2xl p-4 flex items-start gap-3">
+        <span className="text-2xl">💡</span>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">İletişim ve Bildirimler</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            SMS gönderimi, WhatsApp mesajlaşma yönetimi ve Akıllı Bildirim ayarlarınızı yapılandırın.
+          <p className="text-sm font-semibold text-gray-800">Nasıl çalışır?</p>
+          <p className="text-xs text-gray-600 mt-1">
+            "Gönder" butonuna basınca her müşteri için WhatsApp penceresi açılır, mesaj hazır yazılı gelir.
+            Siz sadece WhatsApp'taki <strong>Gönder</strong> butonuna basarsınız. Uygulama veya sunucu gerekmez! 🚀
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* SMS Module */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden flex flex-col h-[500px]">
-          <div className="bg-[#1B4332] p-4 text-white flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              <h3 className="font-semibold">Toplu SMS Yönetimi</h3>
-            </div>
-            <span className="text-xs bg-white/20 px-2 py-1 rounded-md">Bakiye: 4,250</span>
+
+        {/* Sol: Şablon seçici */}
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 p-5 space-y-4">
+          <h3 className="font-semibold text-gray-900 flex items-center gap-2"><MessageCircle className="h-5 w-5 text-[#25D366]" /> Mesaj Şablonu</h3>
+          <div className="space-y-2">
+            {TEMPLATES.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setSelectedTemplate(t.id)}
+                className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all text-sm font-medium flex items-center gap-2 ${selectedTemplate === t.id ? 'border-[#1B4332] bg-[#1B4332]/5 text-[#1B4332]' : 'border-gray-100 hover:border-gray-200 text-gray-600'}`}
+              >
+                <span className="text-lg">{t.icon}</span> {t.label}
+              </button>
+            ))}
           </div>
-          <div className="p-4 flex-1 flex flex-col gap-4">
+
+          {selectedTemplate === 'custom' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Alıcılar</label>
-              <select className="w-full rounded-lg border-gray-300 text-sm focus:ring-[#1B4332] focus:border-[#1B4332] py-2 border px-3">
-                <option>Aşısı Geciken Hastalar</option>
-                <option>Bugün Randevusu Olanlar</option>
-                <option>Tüm Müşteriler</option>
-                <option>Özel Seçim...</option>
-              </select>
-            </div>
-            <div className="flex-1 flex flex-col">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mesaj Metni</label>
-              <textarea 
-                className="w-full flex-1 rounded-lg border-gray-300 text-sm focus:ring-[#1B4332] focus:border-[#1B4332] p-3 resize-none border"
-                placeholder="Sayın {Müşteri Adı}, {Hasta Adı} isimli can dostunuzun aşı tarihi gelmiştir..."
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mesajınızı yazın</label>
+              <textarea
+                value={customText}
+                onChange={e => setCustomText(e.target.value)}
+                rows={5}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#25D366] focus:border-[#25D366] resize-none"
+                placeholder="Merhaba {isim}, ..."
               />
             </div>
-            <button onClick={() => toast.success('Demo: 142 kişiye SMS başarıyla gönderildi.')} className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1B4332] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#122c21] transition-colors">
-              <Send className="h-4 w-4" />
-              Gönder (142 Kişi)
-            </button>
-          </div>
+          )}
+
+          {/* İstatistik */}
+          {sentCount > 0 && (
+            <div className="bg-green-50 rounded-xl p-3 text-center">
+              <p className="text-sm font-semibold text-green-700">✅ Bu oturumda {sentCount} mesaj açıldı</p>
+            </div>
+          )}
         </div>
 
-        {/* WhatsApp Module */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden flex flex-col h-[500px]">
-          <div className="bg-[#25D366] p-4 text-white flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              <h3 className="font-semibold">WhatsApp Entegrasyonu</h3>
-            </div>
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-            </span>
-          </div>
-          <div className="flex-1 bg-[url('https://web.whatsapp.com/img/bg-chat-tile-light_04fcacde539c58cca6745483d4858c52.png')] bg-repeat opacity-90 p-4 overflow-y-auto">
-            <div className="flex flex-col space-y-4">
-              <div className="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[85%] self-start text-sm border border-gray-100">
-                <p className="font-semibold text-[#1B4332] mb-1">Mehmet Kaya</p>
-                <p className="text-gray-800">Merhaba, Cesur'un yarınki kuduz aşısı randevusunu saat 14:00'e alabilir miyiz?</p>
-                <span className="text-[10px] text-gray-500 mt-1 block text-right">10:42</span>
-              </div>
-              <div className="bg-[#d9fdd3] rounded-lg rounded-tr-none p-3 shadow-sm max-w-[85%] self-end text-sm">
-                <p className="text-gray-800">Tabii ki Mehmet Bey, randevu saatinizi 14:00 olarak güncelledim.</p>
-                <span className="text-[10px] text-gray-600 mt-1 block text-right">10:45</span>
-              </div>
-            </div>
-          </div>
-          <div className="p-3 bg-gray-50 border-t border-gray-100 flex items-center gap-2">
-            <input type="text" placeholder="Mesaj yazın..." className="flex-1 border rounded-full border-gray-300 bg-white py-2 px-4 text-sm focus:ring-[#25D366] focus:border-[#25D366]" />
-            <button onClick={() => toast.success('Demo: Mesaj gönderildi.')} className="p-2.5 rounded-full bg-[#25D366] text-white hover:bg-[#20bd5a] transition-colors">
-              <Send className="h-4 w-4" />
+        {/* Orta: Alıcı grubu */}
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 p-5 space-y-4">
+          <h3 className="font-semibold text-gray-900 flex items-center gap-2"><Users className="h-5 w-5 text-[#1B4332]" /> Alıcı Grubu</h3>
+
+          {[
+            { key: 'all', label: 'Tüm Müşteriler', icon: '👥', count: groups.all.length },
+            { key: 'appointment_tomorrow', label: 'Yarın Randevusu Olanlar', icon: '📅', count: groups.appointment_tomorrow.length },
+            { key: 'vaccine_due', label: 'Aşısı Gecikmiş Olanlar', icon: '💉', count: groups.vaccine_due.length },
+            { key: 'treatment', label: 'Tedavide Olanlar', icon: '🩺', count: groups.treatment.length },
+          ].map(g => (
+            <button
+              key={g.key}
+              onClick={() => setSelectedGroup(g.key as any)}
+              className={`w-full text-left px-4 py-3 rounded-xl border-2 transition-all flex items-center justify-between ${selectedGroup === g.key ? 'border-[#1B4332] bg-[#1B4332]/5' : 'border-gray-100 hover:border-gray-200'}`}
+            >
+              <span className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <span className="text-lg">{g.icon}</span> {g.label}
+              </span>
+              <span className={`text-xs font-bold px-2 py-1 rounded-full ${selectedGroup === g.key ? 'bg-[#1B4332] text-white' : 'bg-gray-100 text-gray-600'}`}>
+                {g.count}
+              </span>
             </button>
-          </div>
+          ))}
         </div>
 
-        {/* Smart Notifications */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden flex flex-col h-[500px]">
-          <div className="bg-[#1B4332] p-4 text-white flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              <h3 className="font-semibold">Akıllı Bildirimler</h3>
-            </div>
-            <button onClick={() => toast.success('Geçmiş temizlendi')}><History className="h-4 w-4 text-[#95D5B2]" /></button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-0">
-            <div className="divide-y divide-gray-100">
-              <div className="p-4 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => toast.info('Kuduz aşısı siparişi verildi (Demo)')}>
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <AlertTriangle className="h-4 w-4 text-red-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900">Stok Uyarısı</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">Kuduz aşısı stokları kritik seviyeye (5 adet) düştü. Sipariş verilmeli.</p>
-                    <span className="text-[10px] text-gray-400 mt-1 block">15 dakika önce</span>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => toast.info('Takvime yönlendiriliyorsunuz (Demo)')}>
-                <div className="flex items-start gap-3">
-                  <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Calendar className="h-4 w-4 text-[#1B4332]" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900">Günlük Özet</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">Bugün toplam 12 randevunuz bulunmaktadır.</p>
-                    <span className="text-[10px] text-gray-400 mt-1 block">Bu sabah 08:00</span>
-                  </div>
-                </div>
-              </div>
+        {/* Sağ: Önizleme & Gönder */}
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 p-5 space-y-4 flex flex-col">
+          <h3 className="font-semibold text-gray-900 flex items-center gap-2"><Phone className="h-5 w-5 text-[#25D366]" /> Önizleme & Gönder</h3>
+
+          {/* WhatsApp önizleme */}
+          <div className="flex-1 bg-[#e5ddd5] rounded-xl p-3 min-h-[180px]">
+            <div className="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[90%] text-sm">
+              <p className="font-semibold text-[#1B4332] mb-1 text-xs">Klinik</p>
+              <p className="text-gray-800 whitespace-pre-wrap text-xs leading-relaxed">
+                {selectedTemplate === 'custom'
+                  ? (customText || '(Mesajınızı yazın...)')
+                  : template.text(recipients[0]?.name || 'Tarçın', recipients[0]?.owner || 'Ahmet Bey')}
+              </p>
+              <span className="text-[10px] text-gray-400 mt-1 block text-right">şimdi ✓✓</span>
             </div>
           </div>
-          <div className="p-3 bg-gray-50 border-t border-gray-100 text-center">
-            <button onClick={() => toast.info('Demo: Ayarlara gidiliyor...')} className="text-sm font-medium text-[#1B4332] hover:text-indigo-700 flex items-center justify-center w-full gap-1">
-              Tüm Bildirim Ayarları <ArrowRight className="h-4 w-4" />
-            </button>
+
+          {/* Alıcı listesi */}
+          <div className="max-h-36 overflow-y-auto space-y-1">
+            {recipients.length === 0 ? (
+              <p className="text-xs text-gray-400 text-center py-4">Bu grupta telefon numarası kayıtlı kimse yok</p>
+            ) : recipients.map(p => (
+              <div key={p.id} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-50">
+                <span className="text-sm text-gray-700">{p.owner} <span className="text-gray-400">({p.name})</span></span>
+                <button
+                  onClick={() => openWhatsApp(p.phone ?? '', buildMessage(p))}
+                  className="text-xs text-[#25D366] hover:text-[#20bd5a] font-semibold"
+                >
+                  💬 Gönder
+                </button>
+              </div>
+            ))}
           </div>
+
+          {/* Toplu gönder butonu */}
+          <button
+            onClick={sendToAll}
+            disabled={recipients.length === 0}
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-sm font-bold text-white hover:bg-[#20bd5a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#25D366]/30"
+          >
+            <Send className="h-4 w-4" />
+            {recipients.length > 0
+              ? `${recipients.length} Kişiye WhatsApp Gönder`
+              : 'Uygun müşteri yok'}
+          </button>
+          <p className="text-xs text-gray-400 text-center">Her pencerede WhatsApp'taki "Gönder" butonuna basın</p>
+        </div>
+      </div>
+
+      {/* Bireysel hızlı mesaj */}
+      <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden">
+        <div className="p-4 border-b border-gray-100 bg-slate-50/50 flex items-center justify-between">
+          <h3 className="font-semibold text-gray-900">⚡ Hızlı Bireysel Mesaj</h3>
+          <span className="text-xs text-gray-400">{patients.filter(p => p.phone).length} müşteride telefon kayıtlı</span>
+        </div>
+        <div className="divide-y divide-gray-50">
+          {patients.map(p => (
+            <div key={p.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors">
+              <div>
+                <span className="text-sm font-semibold text-gray-800">{p.owner}</span>
+                <span className="text-xs text-gray-500 ml-2">({p.name} · {p.species})</span>
+                {!p.phone && <span className="text-xs text-red-400 ml-2">📵 Telefon yok</span>}
+              </div>
+              <div className="flex items-center gap-2">
+                {p.phone ? (
+                  <>
+                    <button onClick={() => openWhatsApp(p.phone ?? '', `Merhaba ${p.owner} Hanım/Bey,\n${p.name} ile ilgili bilgilendirme yapmak istiyoruz. 🐾`)} className="text-xs px-3 py-1.5 bg-[#25D366] text-white rounded-lg hover:bg-[#20bd5a] font-medium">💬 Mesaj</button>
+                    <button onClick={() => openWhatsApp(p.phone ?? '', `Merhaba ${p.owner} Hanım/Bey,\n${p.name} için randevunuzu hatırlatmak istedik. 📅`)} className="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-medium">📅 Hatırlat</button>
+                    <button onClick={() => openWhatsApp(p.phone ?? '', `Merhaba ${p.owner} Hanım/Bey,\n${p.name} adlı dostunuzun aşı zamanı geldi! 💉`)} className="text-xs px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-medium">💉 Aşı</button>
+                  </>
+                ) : (
+                  <span className="text-xs text-gray-400 italic">Hasta kartından telefon ekleyin</span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

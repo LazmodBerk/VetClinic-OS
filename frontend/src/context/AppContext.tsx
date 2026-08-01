@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
 // Types
 export interface Patient {
@@ -7,6 +7,7 @@ export interface Patient {
   species: string;
   breed: string;
   owner: string;
+  phone?: string;      // Sahip telefon numarası (WhatsApp için) - isteğe bağlı
   lastVisit: string;
   weight: string;
   status: string;
@@ -101,10 +102,10 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [patients, setPatients] = useState<Patient[]>([
-    { id: 1, name: 'Tarçın', species: 'Köpek', breed: 'Golden Retriever', owner: 'Ahmet Yılmaz', lastVisit: '12 Eki 2026', weight: '28 kg', status: 'Sağlıklı' },
-    { id: 2, name: 'Pamuk', species: 'Kedi', breed: 'Van Kedisi', owner: 'Ayşe Kaya', lastVisit: '05 Eyl 2026', weight: '4.2 kg', status: 'Tedavide' },
-    { id: 3, name: 'Cesur', species: 'Köpek', breed: 'Kangal', owner: 'Mehmet Demir', lastVisit: '20 Ağu 2026', weight: '45 kg', status: 'Sağlıklı' },
-    { id: 4, name: 'Limon', species: 'Kuş', breed: 'Muhabbet', owner: 'Mehmet Demir', lastVisit: '27 Tem 2026', weight: '0.1 kg', status: 'Kontrol Bekliyor' },
+    { id: 1, name: 'Tarçın', species: 'Köpek', breed: 'Golden Retriever', owner: 'Ahmet Yılmaz', phone: '5551234567', lastVisit: '12 Eki 2026', weight: '28 kg', status: 'Sağlıklı' },
+    { id: 2, name: 'Pamuk', species: 'Kedi', breed: 'Van Kedisi', owner: 'Ayşe Kaya', phone: '5559876543', lastVisit: '05 Eyl 2026', weight: '4.2 kg', status: 'Tedavide' },
+    { id: 3, name: 'Cesur', species: 'Köpek', breed: 'Kangal', owner: 'Mehmet Demir', phone: '5553456789', lastVisit: '20 Ağu 2026', weight: '45 kg', status: 'Sağlıklı' },
+    { id: 4, name: 'Limon', species: 'Kuş', breed: 'Muhabbet', owner: 'Mehmet Demir', phone: '5553456789', lastVisit: '27 Tem 2026', weight: '0.1 kg', status: 'Kontrol Bekliyor' },
   ]);
 
   const [appointments, setAppointments] = useState<Appointment[]>([
