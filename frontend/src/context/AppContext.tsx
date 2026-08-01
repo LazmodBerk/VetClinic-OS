@@ -43,6 +43,7 @@ export interface Vaccine {
   owner: string;
   vaccine: string;
   date: string;
+  time?: string;
   status: string;
 }
 
@@ -131,7 +132,11 @@ function usePersistedState<T>(key: string, defaultValue: T) {
 // ─────────────────────────────────────────────
 const DEFAULT_PATIENTS: Patient[] = [];
 const DEFAULT_APPOINTMENTS: Appointment[] = [];
-const DEFAULT_VACCINES: Vaccine[] = [];
+const DEFAULT_VACCINES: Vaccine[] = [
+  { id: 1, patient: 'Pamuk', owner: 'Ahmet Yılmaz', vaccine: 'Karma 1', date: 'Bugün', time: '14:30', status: 'Bekliyor' },
+  { id: 2, patient: 'Tarçın', owner: 'Ayşe Demir', vaccine: 'Kuduz', date: 'Yarın', time: '10:00', status: 'Planlandı' },
+  { id: 3, patient: 'Max', owner: 'Can Kaya', vaccine: 'Lyme', date: '15 Haz 2026', time: '11:15', status: 'Tamamlandı' },
+];
 const DEFAULT_INVENTORY: InventoryItem[] = [];
 const DEFAULT_TRANSACTIONS: Transaction[] = [];
 const DEFAULT_FARM: FarmAnimal[] = [];

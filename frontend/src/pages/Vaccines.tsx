@@ -11,6 +11,8 @@ export function Vaccines() {
   const [patientName, setPatientName] = useState('');
   const [vaccineType, setVaccineType] = useState('Karma');
   const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [filterOverdue, setFilterOverdue] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,12 +29,13 @@ export function Vaccines() {
       owner,
       vaccine: vaccineType,
       date,
+      time,
       status: 'Planlandı'
     });
     
     toast.success('Aşı planlaması başarıyla eklendi!');
     setIsModalOpen(false);
-    setPatientName(''); setVaccineType('Karma'); setDate('');
+    setPatientName(''); setVaccineType('Karma'); setDate(''); setTime('');
   };
 
   return (
@@ -55,10 +58,10 @@ export function Vaccines() {
       <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden">
         <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-50/50">
           <div className="flex gap-2">
-            <button onClick={() => toast.info('Demo: Filtre uygulandı')} className="px-3 py-1.5 text-sm font-medium bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-center gap-1">
-              <AlertCircle className="h-4 w-4" /> Gecikenler (1)
+            <button onClick={() => setFilterOverdue(!filterOverdue)} className={`px-3 py-1.5 text-sm font-medium rounded-lg flex items-center gap-1 transition-colors ${filterOverdue ? 'bg-red-500 text-white' : 'bg-red-50 text-red-700 border border-red-100 hover:bg-red-100'}`}>
+              <AlertCircle className="h-4 w-4" /> Gecikenler
             </button>
-            <button onClick={() => toast.info('Demo: SMS Gönderiliyor...')} className="px-3 py-1.5 text-sm font-medium bg-white text-gray-700 rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50">
+            <button onClick={() => toast.info('WhatsApp web açılıyor...')} className="px-3 py-1.5 text-sm font-medium bg-white text-gray-700 rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50">
               Toplu Hatırlatma Gönder
             </button>
           </div>
@@ -67,7 +70,7 @@ export function Vaccines() {
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
               <input type="text" placeholder="Hasta veya Aşı Ara..." className="w-full border rounded-lg border-gray-300 text-sm focus:ring-[#1B4332] focus:border-[#1B4332] py-2 pl-9 pr-3" />
             </div>
-            <button onClick={() => toast.info('Demo: Filtreler açıldı')} className="flex items-center justify-center rounded-lg bg-white px-3 py-2 text-gray-500 hover:text-gray-700 shadow-sm border border-gray-200 transition-colors">
+            <button className="flex items-center justify-center rounded-lg bg-white px-3 py-2 text-gray-500 hover:text-gray-700 shadow-sm border border-gray-200 transition-colors">
               <Filter className="h-4 w-4" />
             </button>
           </div>
@@ -85,7 +88,7 @@ export function Vaccines() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {vaccines.map((vaccine) => (
+              {vaccines.filter(v => filterOverdue ? (v.status === 'Gecikmiş' || v.status === 'Bekliyor') : true).map((vaccine) => (
                 <tr key={vaccine.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm font-bold text-gray-900">
@@ -100,7 +103,7 @@ export function Vaccines() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center text-sm text-gray-500">
                       <Calendar className="h-4 w-4 mr-2" />
-                      {vaccine.date}
+                      {vaccine.date} {vaccine.time && <span className="ml-2 font-medium bg-gray-100 px-2 py-0.5 rounded">{vaccine.time}</span>}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -158,6 +161,10 @@ export function Vaccines() {
             <div className="col-span-2 sm:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">Tarih *</label>
               <input required value={date} onChange={e => setDate(e.target.value)} type="date" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" />
+            </div>
+            <div className="col-span-2 sm:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Saat</label>
+              <input value={time} onChange={e => setTime(e.target.value)} type="time" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" />
             </div>
           </div>
           <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">
