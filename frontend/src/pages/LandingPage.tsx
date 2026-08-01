@@ -28,6 +28,13 @@ export function LandingPage() {
             Hasta Portalı Girişi
           </button>
         </div>
+        
+        {/* Mobile Back Button */}
+        <div className="md:hidden">
+          <button onClick={() => navigate('/')} className="flex items-center justify-center p-2 rounded-full bg-[#1B4332] text-white shadow-md active:bg-[#122c21] transition-colors" aria-label="Klinik Paneline Dön">
+            <ArrowRight className="h-5 w-5" />
+          </button>
+        </div>
       </nav>
 
       {/* Hero Section */}
