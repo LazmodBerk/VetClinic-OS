@@ -58,7 +58,7 @@ export function AiAssistant() {
         Kullanıcının sorusu: ${input}
         `;
 
-        const response = await fetch(\`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=\${settings.geminiApiKey}\`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${settings.geminiApiKey}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export function AiAssistant() {
         setMessages(prev => [...prev, {
           id: Date.now() + 1,
           role: 'ai',
-          text: \`Gemini API bağlantısında bir hata oluştu. Lütfen API anahtarınızı (Ayarlar sayfasından) kontrol edin. Hata Detayı: \${error}\`
+          text: `Gemini API bağlantısında bir hata oluştu. Lütfen API anahtarınızı (Ayarlar sayfasından) kontrol edin. Hata Detayı: ${error}`
         }]);
       } finally {
         setIsTyping(false);
@@ -100,16 +100,16 @@ export function AiAssistant() {
 
         const responses = {
           asi: [
-            \`Aşı ve stok verilerinizi analiz ettim:\n\n- **Bekleyen Aşılar:** Toplam \${vaccines.filter(v => v.status === 'Bekliyor').length} adet planlanmış aşı randevunuz var.\n- Müşterilere hatırlatma mesajlarını göndermeyi unutmayın!\`,
-            \`Şu anda \${vaccines.filter(v => v.status === 'Bekliyor').length} hastanın aşısı beklemede. Düzenli aşı takibi kliniğin sağlığı için çok önemlidir.\`
+            `Aşı ve stok verilerinizi analiz ettim:\n\n- **Bekleyen Aşılar:** Toplam ${vaccines.filter(v => v.status === 'Bekliyor').length} adet planlanmış aşı randevunuz var.\n- Müşterilere hatırlatma mesajlarını göndermeyi unutmayın!`,
+            `Şu anda ${vaccines.filter(v => v.status === 'Bekliyor').length} hastanın aşısı beklemede. Düzenli aşı takibi kliniğin sağlığı için çok önemlidir.`
           ],
           stok: [
-            \`**Kritik Stoklar:** Sistemde şu an \${inventoryItems.filter(i => i.status === 'Kritik').length} adet ürün bitmek üzere.\nLütfen eksikleri tedarikçinize hemen bildirin!\`,
-            \`Stok durumunu taradım. \${inventoryItems.filter(i => i.status === 'Kritik').map(i => i.name).join(', ')} ürünlerinde azalma mevcut.\`
+            `**Kritik Stoklar:** Sistemde şu an ${inventoryItems.filter(i => i.status === 'Kritik').length} adet ürün bitmek üzere.\nLütfen eksikleri tedarikçinize hemen bildirin!`,
+            `Stok durumunu taradım. ${inventoryItems.filter(i => i.status === 'Kritik').map(i => i.name).join(', ')} ürünlerinde azalma mevcut.`
           ],
           hasta: [
-            \`Kliniğinizde kayıtlı \${patients.length} hasta bulunuyor. Her şey yolunda görünüyor, iyi çalışmalar!\`,
-            \`Hasta ve randevu durumunuz aktif şekilde işleniyor. Toplam \${patients.length} kayıtlı pet dostumuz var.\`
+            `Kliniğinizde kayıtlı ${patients.length} hasta bulunuyor. Her şey yolunda görünüyor, iyi çalışmalar!`,
+            `Hasta ve randevu durumunuz aktif şekilde işleniyor. Toplam ${patients.length} kayıtlı pet dostumuz var.`
           ]
         };
 
@@ -121,9 +121,9 @@ export function AiAssistant() {
           aiText = responses.hasta[Math.floor(Math.random() * responses.hasta.length)];
         } else {
           const defaultResponses = [
-            \`Bunu tam olarak anlayamadım ama sistemin genel durumu şu an stabil. Size nasıl daha spesifik yardımcı olabilirim?\`,
-            \`Sisteminizde her şey tıkır tıkır işliyor. Lütfen stok veya hasta raporu gibi kelimeler kullanarak bana sorun.\`,
-            \`Şu anki analizime göre tüm modüller sorunsuz çalışmakta.\`
+            `Bunu tam olarak anlayamadım ama sistemin genel durumu şu an stabil. Size nasıl daha spesifik yardımcı olabilirim?`,
+            `Sisteminizde her şey tıkır tıkır işliyor. Lütfen stok veya hasta raporu gibi kelimeler kullanarak bana sorun.`,
+            `Şu anki analizime göre tüm modüller sorunsuz çalışmakta.`
           ];
           aiText = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
         }
