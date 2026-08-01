@@ -1,5 +1,5 @@
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Tractor, Smartphone, Home, CheckCircle2, Clock, Brain, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Tractor, Smartphone, Home, CheckCircle2, Clock, Brain, Moon, Sun, Globe } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Dashboard } from './pages/Dashboard';
 import { Appointments } from './pages/Appointments';
@@ -156,14 +156,15 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center space-x-2 relative" ref={notifRef}>
             <button 
               onClick={() => navigate('/website')} 
-              className="flex items-center justify-center rounded-full px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 shadow-sm border border-green-200 transition-colors text-xs font-bold mr-2"
+              className="flex items-center justify-center rounded-full p-2 md:px-3 md:py-1.5 bg-white dark:bg-slate-800 text-gray-400 hover:text-[#1B4332] dark:hover:text-[#95D5B2] shadow-sm border border-gray-200 dark:border-slate-700 transition-colors md:text-xs md:font-bold mr-1"
               title="Siteye Git"
             >
-              Web Sitesi
+              <Globe className="h-5 w-5 md:mr-1.5" aria-hidden="true" />
+              <span className="hidden md:inline">Web Sitesi</span>
             </button>
             <button 
               onClick={() => navigate('/')} 
-              className="flex items-center justify-center rounded-full p-2 bg-white text-gray-400 hover:text-[#1B4332] shadow-sm border border-gray-200 transition-colors"
+              className="flex items-center justify-center rounded-full p-2 bg-white dark:bg-slate-800 text-gray-400 hover:text-[#1B4332] dark:hover:text-[#95D5B2] shadow-sm border border-gray-200 dark:border-slate-700 transition-colors"
               title="Ana Sayfaya Dön"
             >
               <Home className="h-5 w-5" aria-hidden="true" />
