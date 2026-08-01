@@ -105,11 +105,42 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: 'Pamuk için Karma Aşı vakti geldi.', time: '10 dk önce', read: false },
-    { id: 2, text: 'Yarın 3 operasyon randevunuz var.', time: '1 saat önce', read: false },
-    { id: 3, text: 'Kuduz aşısı stokları kritik seviyede (5 doz kaldı).', time: 'Dün', read: false },
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  // Dinamik olarak UI bildirim kartını güncelle
+  useEffect(() => {
+    const dynamicNotifs: any[] = [];
+    let idCounter = 1;
+
+    // Stok Bildirimi
+    const criticalStock = inventoryItems.filter(i => i.status === 'Kritik');
+    if (criticalStock.length > 0) {
+      dynamicNotifs.push({
+        id: idCounter++,
+        text: `${criticalStock.length} ürün kritik stok seviyesinde!`,
+        time: 'Şimdi',
+        read: false
+      });
+    }
+
+    // Aşı Bildirimi (Bugün ve Yarın)
+    const todayStr = new Date().toLocaleDateString('tr-TR');
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toLocaleDateString('tr-TR');
+
+    const upcomingVaccines = vaccines.filter(v => v.date === todayStr || v.date === tomorrowStr);
+    upcomingVaccines.forEach(v => {
+      dynamicNotifs.push({
+        id: idCounter++,
+        text: `${v.patient} için ${v.vaccine} aşısı vakti (${v.date === todayStr ? 'Bugün' : 'Yarın'})`,
+        time: 'Şimdi',
+        read: false
+      });
+    });
+
+    setNotifications(dynamicNotifs);
+  }, [inventoryItems, vaccines]);
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 

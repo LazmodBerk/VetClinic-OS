@@ -15,6 +15,7 @@ export interface Patient {
   age?: string;
   owner: string;
   phone?: string;
+  email?: string;
   ownerGender?: 'bay' | 'bayan';
   lastVisit?: string;
   weight?: string;
@@ -195,6 +196,7 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
           setPatients(pts.map((pt: any) => ({
             ...pt,
             ownerGender: pt.owner_gender,
+            email: pt.email,
             lastVisit: pt.last_visit,
             medicalInfo: pt.medical_info
           })));
@@ -247,6 +249,7 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
       age: p.age,
       owner: p.owner,
       phone: p.phone,
+      email: p.email,
       owner_gender: p.ownerGender,
       last_visit: p.lastVisit,
       weight: p.weight,
@@ -260,6 +263,7 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
       setPatients(prev => [{
         ...data,
         ownerGender: data.owner_gender,
+        email: data.email,
         lastVisit: data.last_visit,
         medicalInfo: data.medical_info
       }, ...prev]);
@@ -274,6 +278,7 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
       age: p.age,
       owner: p.owner,
       phone: p.phone,
+      email: p.email,
       owner_gender: p.ownerGender,
       last_visit: p.lastVisit,
       weight: p.weight,
@@ -284,6 +289,7 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
       setPatients(prev => prev.map(pt => pt.id === p.id ? {
         ...data,
         ownerGender: data.owner_gender,
+        email: data.email,
         lastVisit: data.last_visit,
         medicalInfo: data.medical_info
       } : pt));

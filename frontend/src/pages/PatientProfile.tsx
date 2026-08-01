@@ -17,7 +17,7 @@ export function PatientProfile() {
   
   const patient = patients.find(p => String(p.id) === String(id));
   const [editFormData, setEditFormData] = useState(patient || {
-    id: 0, name: '', species: '', breed: '', owner: '', ownerGender: 'bay' as const, lastVisit: '', weight: '', status: '',
+    id: 0, name: '', species: '', breed: '', owner: '', phone: '', email: '', ownerGender: 'bay' as const, lastVisit: '', weight: '', status: '',
     medicalInfo: { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '' }
   });
 
@@ -178,11 +178,11 @@ export function PatientProfile() {
               </div>
               <div className="flex items-center gap-3 text-gray-600">
                 <Phone className="h-4 w-4 text-blue-500" />
-                <span className="text-sm">+90 (555) 123 45 67</span>
+                <span className="text-sm">{patient.phone || 'Belirtilmedi'}</span>
               </div>
               <div className="flex items-center gap-3 text-gray-600">
                 <Mail className="h-4 w-4 text-blue-500" />
-                <span className="text-sm">sahip@email.com</span>
+                <span className="text-sm">{patient.email || 'Belirtilmedi'}</span>
               </div>
               <div className="flex items-start gap-3 text-gray-600">
                 <MapPin className="h-4 w-4 text-blue-500 mt-0.5" />
@@ -423,6 +423,26 @@ export function PatientProfile() {
                   type="text" 
                   value={editFormData.owner}
                   onChange={(e) => setEditFormData({...editFormData, owner: e.target.value})}
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                <input 
+                  type="tel" 
+                  value={editFormData.phone || ''}
+                  onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})}
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
+                <input 
+                  type="email" 
+                  value={editFormData.email || ''}
+                  onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
                   className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
                 />
               </div>

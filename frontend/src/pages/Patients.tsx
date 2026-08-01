@@ -34,12 +34,13 @@ export function Patients() {
   const [owner, setOwner] = useState('');
   const [ownerGender, setOwnerGender] = useState<'bay' | 'bayan'>('bay');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [weight, setWeight] = useState('');
   const [age, setAge] = useState('');
 
   const resetForm = () => {
     setName(''); setSpecies('Köpek'); setBreed('');
-    setOwner(''); setOwnerGender('bay'); setPhone(''); setWeight(''); setAge('');
+    setOwner(''); setOwnerGender('bay'); setPhone(''); setEmail(''); setWeight(''); setAge('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,7 +52,7 @@ export function Patients() {
         name, species,
         breed: breed || 'Belirtilmedi',
         age: age || 'Bilinmiyor',
-        owner, ownerGender, phone,
+        owner, ownerGender, phone, email,
         weight: weight ? `${weight} kg` : '-',
         lastVisit: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
         status: 'Sağlıklı'
@@ -158,9 +159,15 @@ export function Patients() {
                     <span className="font-medium text-gray-900">{patient.owner} {title}</span>
                   </div>
                   {patient.phone && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Telefon:</span>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Phone className="h-3.5 w-3.5 text-blue-500" />
                       <span className="font-medium text-gray-900">{patient.phone}</span>
+                    </div>
+                  )}
+                  {patient.email && (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Mail className="h-3.5 w-3.5 text-blue-500" />
+                      <span className="font-medium text-gray-900">{patient.email}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
@@ -248,6 +255,11 @@ export function Patients() {
             <div className="col-span-2 sm:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">📱 Telefon (WhatsApp)</label>
               <input value={phone} onChange={e => setPhone(e.target.value)} type="tel" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" placeholder="5551234567" />
+            </div>
+            {/* E-posta */}
+            <div className="col-span-2 sm:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">📧 E-posta</label>
+              <input value={email} onChange={e => setEmail(e.target.value)} type="email" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" placeholder="sahip@email.com" />
             </div>
             {/* Yaş */}
             <div className="col-span-2 sm:col-span-1">
