@@ -73,7 +73,48 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Global Dark Mode Overrides for Hardcoded Tailwind Classes */
+  .dark .bg-white {
+    @apply bg-slate-800 border-slate-700 !important;
+  }
+  .dark .text-gray-900 {
+    @apply text-slate-100 !important;
+  }
+  .dark .text-gray-800 {
+    @apply text-slate-200 !important;
+  }
+  .dark .text-gray-700 {
+    @apply text-slate-300 !important;
+  }
+  .dark .text-gray-600 {
+    @apply text-slate-300 !important;
+  }
+  .dark .text-gray-500 {
+    @apply text-slate-400 !important;
+  }
+  .dark .bg-gray-50 {
+    @apply bg-slate-800/50 !important;
+  }
+  .dark .bg-slate-50\/50, .dark .bg-slate-50\/30 {
+    @apply bg-slate-900/50 !important;
+  }
+  .dark .border-gray-50, .dark .border-gray-100 {
+    @apply border-slate-700/50 !important;
+  }
+  .dark .border-gray-200 {
+    @apply border-slate-700 !important;
+  }
+  .dark .border-gray-300 {
+    @apply border-slate-600 !important;
+  }
+  .dark input, .dark textarea, .dark select {
+    @apply bg-slate-800 text-white border-slate-600 !important;
+  }
+  .dark table th {
+    @apply text-slate-400 !important;
   }
 }

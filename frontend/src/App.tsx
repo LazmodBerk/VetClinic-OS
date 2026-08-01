@@ -1,5 +1,5 @@
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Tractor, Smartphone, Home, CheckCircle2, Clock, Brain } from 'lucide-react';
+import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Tractor, Smartphone, Home, CheckCircle2, Clock, Brain, Moon, Sun } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Dashboard } from './pages/Dashboard';
 import { Appointments } from './pages/Appointments';
@@ -15,7 +15,7 @@ import { Settings } from './pages/Settings';
 import { Portal } from './pages/Portal';
 import { AiInsights } from './pages/AiInsights';
 import { AiAssistant } from './pages/AiAssistant';
-import { AppProvider } from './context/AppContext';
+import { AppProvider, useAppContext } from './context/AppContext';
 import { Logo } from './components/Logo';
 import { PatientProfile } from './pages/PatientProfile';
 import { LandingPage } from './pages/LandingPage';
@@ -38,6 +38,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useAppContext();
   
   // Global Notifications State
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -67,17 +68,26 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#F8F9FA] font-sans selection:bg-[#95D5B2] selection:text-[#1B4332]">
-      <Toaster position="top-center" richColors />
-      {/* Sidebar for Desktop */}
-      <aside className="hidden w-72 flex-col bg-[#1B4332] border-r border-[#1B4332] md:flex transition-all duration-300 shadow-xl z-20">
-        <div className="flex h-16 shrink-0 items-center px-6 border-b border-[#2a5a45]">
-          <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+    <div className={`flex h-screen ${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-[#F8F9FA]'} font-sans selection:bg-[#95D5B2] selection:text-[#1B4332] transition-colors duration-300`}>
+      <Toaster position="top-center" richColors theme={theme} />
+      
+      {/* Mobile Sidebar Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity" onClick={() => setMobileMenuOpen(false)}></div>
+      )}
+
+      {/* Sidebar for Desktop & Mobile */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 flex-col bg-[#1B4332] border-r border-[#1B4332] transition-transform duration-300 shadow-xl flex md:static md:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex h-16 shrink-0 items-center justify-between px-6 border-b border-[#2a5a45]">
+          <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
             <div className="h-9 w-9 rounded-xl overflow-hidden shadow-lg ring-2 ring-white/10">
               <Logo className="h-9 w-9" />
             </div>
             <h1 className="text-xl font-serif font-bold text-white tracking-wide">CanVet</h1>
           </Link>
+          <button onClick={() => setMobileMenuOpen(false)} className="md:hidden text-white/70 hover:text-white">
+            <X className="h-6 w-6" />
+          </button>
         </div>
         <nav className="flex flex-1 flex-col px-4 py-6 overflow-y-auto space-y-1 custom-scrollbar">
           {navigation.map((item) => {
@@ -86,6 +96,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.name}
                 to={item.href}
+                onClick={() => setMobileMenuOpen(false)}
                 className={`group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 ${
                   isActive
                     ? 'bg-[#95D5B2]/20 text-[#95D5B2] shadow-inner border border-[#95D5B2]/10'
@@ -120,20 +131,21 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
+
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         
         {/* Global Top Bar (Mobile Menu Toggle + Global Actions) */}
-        <header className="flex h-16 items-center justify-between border-b border-gray-100 bg-white px-4 sm:px-6 lg:px-8">
+        <header className="flex h-16 items-center justify-between border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 sm:px-6 lg:px-8 transition-colors">
           <div className="flex items-center md:hidden">
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 -ml-2 text-gray-500 mr-2">
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 -ml-2 text-gray-500 dark:text-gray-400 mr-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
+              <Menu className="h-6 w-6" />
             </button>
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="h-8 w-8 rounded-xl overflow-hidden shadow-sm">
                 <Logo className="h-8 w-8" />
               </div>
-              <span className="text-lg font-bold text-gray-900">CanVet</span>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">CanVet</span>
             </Link>
           </div>
           
@@ -158,12 +170,20 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             </button>
             
             <button 
+              onClick={toggleTheme} 
+              className="flex items-center justify-center rounded-full p-2 bg-white dark:bg-slate-800 text-gray-400 hover:text-[#1B4332] dark:hover:text-[#95D5B2] shadow-sm border border-gray-200 dark:border-slate-700 transition-colors"
+              title="Temayı Değiştir"
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
+            </button>
+            
+            <button 
               onClick={() => setIsNotifOpen(!isNotifOpen)} 
-              className={`flex items-center justify-center rounded-full p-2 transition-colors relative ${isNotifOpen ? 'bg-gray-100 text-gray-700' : 'bg-white text-gray-400 hover:text-gray-500 shadow-sm border border-gray-200'}`}
+              className={`flex items-center justify-center rounded-full p-2 transition-colors relative ${isNotifOpen ? 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200' : 'bg-white dark:bg-slate-800 text-gray-400 hover:text-gray-500 shadow-sm border border-gray-200 dark:border-slate-700'}`}
             >
               <Bell className="h-5 w-5" aria-hidden="true" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-[#E07A5F] ring-2 ring-white"></span>
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-[#E07A5F] ring-2 ring-white dark:ring-slate-800"></span>
               )}
             </button>
 
@@ -211,7 +231,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-gray-50/30">
+        <main className="flex-1 overflow-y-auto bg-gray-50/30 dark:bg-slate-900/50 transition-colors">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 h-full">
             {children}
           </div>

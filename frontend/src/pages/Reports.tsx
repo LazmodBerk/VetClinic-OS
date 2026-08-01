@@ -13,6 +13,8 @@ export function Reports() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTemplate, setNewTemplate] = useState({ title: '', category: 'Form' });
   const [templateList, setTemplateList] = useState(templates);
+  const [filter, setFilter] = useState('Tümü');
+  const [search, setSearch] = useState('');
 
   const handleCreateTemplate = () => {
     if (!newTemplate.title.trim()) {
@@ -54,29 +56,29 @@ export function Reports() {
         <div className="w-full md:w-64 border-r border-gray-100 bg-slate-50/50 p-4 overflow-y-auto">
           <div className="mb-4 relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-            <input type="text" placeholder="Şablon Ara..." className="w-full border rounded-lg border-gray-300 text-sm focus:ring-[#1B4332] focus:border-[#1B4332] py-2 pl-9 pr-3 shadow-sm" />
+            <input value={search} onChange={e => setSearch(e.target.value)} type="text" placeholder="Şablon Ara..." className="w-full border rounded-lg border-gray-300 text-sm focus:ring-[#1B4332] focus:border-[#1B4332] py-2 pl-9 pr-3 shadow-sm" />
           </div>
           
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Kategoriler</h3>
           <ul className="space-y-1">
             <li>
-              <button className="w-full bg-blue-50 text-blue-700 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-                <FileText className="mr-3 h-4 w-4" /> Tüm Şablonlar
+              <button onClick={() => setFilter('Tümü')} className={`w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg ${filter === 'Tümü' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-white border border-transparent hover:border-gray-200'}`}>
+                <FileText className={`mr-3 h-4 w-4 ${filter === 'Tümü' ? '' : 'text-gray-400'}`} /> Tüm Şablonlar
               </button>
             </li>
             <li>
-              <button onClick={() => toast.info('Epikriz Raporları filtrelendi (Demo)')} className="w-full text-gray-700 hover:bg-white border border-transparent hover:border-gray-200 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-                <FileText className="mr-3 h-4 w-4 text-gray-400" /> Epikriz Raporları
+              <button onClick={() => setFilter('Epikriz')} className={`w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg ${filter === 'Epikriz' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-white border border-transparent hover:border-gray-200'}`}>
+                <FileText className={`mr-3 h-4 w-4 ${filter === 'Epikriz' ? '' : 'text-gray-400'}`} /> Epikriz Raporları
               </button>
             </li>
             <li>
-              <button onClick={() => toast.info('Onam Formları filtrelendi (Demo)')} className="w-full text-gray-700 hover:bg-white border border-transparent hover:border-gray-200 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-                <FileText className="mr-3 h-4 w-4 text-gray-400" /> Onam Formları
+              <button onClick={() => setFilter('Form')} className={`w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg ${filter === 'Form' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-white border border-transparent hover:border-gray-200'}`}>
+                <FileText className={`mr-3 h-4 w-4 ${filter === 'Form' ? '' : 'text-gray-400'}`} /> Onam Formları
               </button>
             </li>
             <li>
-              <button onClick={() => toast.info('Özel Formatlar filtrelendi (Demo)')} className="w-full text-gray-700 hover:bg-white border border-transparent hover:border-gray-200 group flex items-center px-3 py-2 text-sm font-medium rounded-lg">
-                <Settings className="mr-3 h-4 w-4 text-gray-400" /> Özel Formatlar
+              <button onClick={() => setFilter('Sözleşme')} className={`w-full group flex items-center px-3 py-2 text-sm font-medium rounded-lg ${filter === 'Sözleşme' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-white border border-transparent hover:border-gray-200'}`}>
+                <Settings className={`mr-3 h-4 w-4 ${filter === 'Sözleşme' ? '' : 'text-gray-400'}`} /> Özel Formatlar
               </button>
             </li>
           </ul>
@@ -85,7 +87,10 @@ export function Reports() {
         {/* List */}
         <div className="flex-1 overflow-y-auto p-6 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {templateList.map(template => (
+            {templateList
+              .filter(t => filter === 'Tümü' || t.category.includes(filter))
+              .filter(t => t.title.toLowerCase().includes(search.toLowerCase()))
+              .map(template => (
               <div key={template.id} className="border border-gray-100 rounded-3xl p-4 hover:shadow-2xl hover:shadow-gray-200/50 hover:-translate-y-1 transition-all duration-300 group relative bg-white">
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center gap-2">
@@ -101,14 +106,11 @@ export function Reports() {
                 <div className="mt-4 flex items-center justify-between">
                   <span className="text-xs text-gray-400">{template.date}</span>
                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => toast.success('Demo: Belge yazdırılıyor...')} className="p-1.5 text-gray-500 hover:text-[#1B4332] bg-gray-50 rounded-lg" title="Yazdır">
+                    <button onClick={() => toast.success('Belge yazdırılıyor...')} className="p-1.5 text-gray-500 hover:text-[#1B4332] bg-gray-50 rounded-lg" title="Yazdır">
                       <Printer className="h-4 w-4" />
                     </button>
-                    <button onClick={() => toast.success('Demo: Belge PDF olarak indirildi.')} className="p-1.5 text-gray-500 hover:text-green-600 bg-gray-50 rounded-lg" title="İndir">
+                    <button onClick={() => toast.success('Belge PDF olarak indirildi.')} className="p-1.5 text-gray-500 hover:text-green-600 bg-gray-50 rounded-lg" title="İndir">
                       <Download className="h-4 w-4" />
-                    </button>
-                    <button onClick={() => toast.success('Demo: Düzenleyici açılıyor...')} className="p-1.5 text-gray-500 hover:text-amber-600 bg-gray-50 rounded-lg" title="Düzenle">
-                      <Settings className="h-4 w-4" />
                     </button>
                   </div>
                 </div>

@@ -11,10 +11,14 @@ export function PatientProfile() {
   
   const [activeTab, setActiveTab] = useState<'appointments' | 'vaccines' | 'notes'>('appointments');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+  const [noteTitle, setNoteTitle] = useState('');
+  const [noteContent, setNoteContent] = useState('');
   
   const patient = patients.find(p => p.id === Number(id));
   const [editFormData, setEditFormData] = useState(patient || {
-    id: 0, name: '', species: '', breed: '', owner: '', ownerGender: 'bay' as const, lastVisit: '', weight: '', status: ''
+    id: 0, name: '', species: '', breed: '', owner: '', ownerGender: 'bay' as const, lastVisit: '', weight: '', status: '',
+    medicalInfo: { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '' }
   });
 
   if (!patient) {
@@ -37,8 +41,31 @@ export function PatientProfile() {
   };
 
   const handleOpenEdit = () => {
-    setEditFormData(patient);
+    setEditFormData({
+      ...patient,
+      medicalInfo: patient?.medicalInfo || { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '' }
+    });
     setIsEditModalOpen(true);
+  };
+
+  const handleAddNote = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!noteTitle || !noteContent) return;
+    
+    const newNote = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('tr-TR'),
+      title: noteTitle,
+      content: noteContent
+    };
+    
+    const updatedNotes = patient.notes ? [newNote, ...patient.notes] : [newNote];
+    updatePatient({ ...patient, notes: updatedNotes });
+    
+    toast.success('Yeni not eklendi.');
+    setIsNoteModalOpen(false);
+    setNoteTitle('');
+    setNoteContent('');
   };
 
   // Filter related data
@@ -117,27 +144,34 @@ export function PatientProfile() {
               Tıbbi Bilgiler
             </h3>
             <div className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                <span className="text-sm text-gray-500">Mikroçip No</span>
-                <span className="text-sm font-mono font-medium text-gray-900">981020002341</span>
+              <div className="flex justify-between items-center py-2 border-b border-gray-50 dark:border-slate-700/50">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Mikroçip No</span>
+                <span className="text-sm font-mono font-medium text-gray-900 dark:text-white">{patient.medicalInfo?.microchipNo || 'Belirtilmedi'}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                <span className="text-sm text-gray-500">Doğum Tarihi</span>
-                <span className="text-sm font-medium text-gray-900">12.04.2023 (3 Yaş)</span>
+              <div className="flex justify-between items-center py-2 border-b border-gray-50 dark:border-slate-700/50">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Doğum Tarihi</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{patient.medicalInfo?.birthDate || 'Belirtilmedi'}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                <span className="text-sm text-gray-500">Cinsiyet</span>
-                <span className="text-sm font-medium text-gray-900">Erkek (Kısırlaştırılmış)</span>
+              <div className="flex justify-between items-center py-2 border-b border-gray-50 dark:border-slate-700/50">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Cinsiyet</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{patient.medicalInfo?.gender || 'Belirtilmedi'}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-50">
-                <span className="text-sm text-gray-500">Kan Grubu</span>
-                <span className="text-sm font-medium text-gray-900">DEA 1.1 Pozitif</span>
+              <div className="flex justify-between items-center py-2 border-b border-gray-50 dark:border-slate-700/50">
+                <span className="text-sm text-gray-500 dark:text-gray-400">Kan Grubu</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{patient.medicalInfo?.bloodType || 'Belirtilmedi'}</span>
               </div>
               <div>
-                <span className="text-sm text-gray-500 block mb-2">Alerjiler</span>
-                <div className="flex gap-2">
-                  <span className="px-2 py-1 bg-red-50 text-red-600 text-xs font-semibold rounded-md border border-red-100">Penisilin</span>
-                  <span className="px-2 py-1 bg-red-50 text-red-600 text-xs font-semibold rounded-md border border-red-100">Piliç Eti</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 block mb-2">Alerjiler</span>
+                <div className="flex gap-2 flex-wrap">
+                  {patient.medicalInfo?.allergies ? (
+                    patient.medicalInfo.allergies.split(',').map((allergy, i) => (
+                      <span key={i} className="px-2 py-1 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-semibold rounded-md border border-red-100 dark:border-red-800/30">
+                        {allergy.trim()}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm text-gray-400">Alerji kaydı yok</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -224,25 +258,21 @@ export function PatientProfile() {
 
               {activeTab === 'notes' && (
                 <div className="space-y-4">
-                  <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm transition-all hover:shadow-md hover:shadow-gray-200/50">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-semibold text-gray-900">Genel Muayene Bulguları</span>
-                      <span className="text-xs text-gray-500">12 Eki 2026</span>
+                  {patient.notes && patient.notes.length > 0 ? patient.notes.map(note => (
+                    <div key={note.id} className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm transition-all hover:shadow-md hover:shadow-gray-200/50">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-semibold text-gray-900">{note.title}</span>
+                        <span className="text-xs text-gray-500">{note.date}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
+                        {note.content}
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Hastanın genel durumu iyi. Kilo kontrolü sağlandı. Diş taşlarında hafif artış var, bir sonraki ziyarette temizlik önerildi.
-                    </p>
-                  </div>
-                  <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm transition-all hover:shadow-md hover:shadow-gray-200/50">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-semibold text-gray-900">Alerji Şüphesi</span>
-                      <span className="text-xs text-gray-500">05 Mar 2026</span>
-                    </div>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      Tavuklu mamaya karşı intolerans gözlemlendi. Hipoalerjenik diyet mamasına geçiş yapıldı.
-                    </p>
-                  </div>
-                  <button onClick={() => toast.success('Demo: Yeni Not Ekleme açıldı')} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-semibold hover:border-blue-400 hover:text-[#1B4332] transition-colors flex items-center justify-center gap-2">
+                  )) : (
+                    <p className="text-center text-gray-500 py-6">Kayıtlı tedavi notu bulunmamaktadır.</p>
+                  )}
+                  
+                  <button onClick={() => setIsNoteModalOpen(true)} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-semibold hover:border-blue-400 hover:text-[#1B4332] transition-colors flex items-center justify-center gap-2">
                     + Yeni Tedavi Notu Ekle
                   </button>
                 </div>
@@ -328,6 +358,58 @@ export function PatientProfile() {
               </div>
             </div>
 
+            <h4 className="font-semibold text-gray-900 mt-6 mb-4 pb-2 border-b border-gray-100">Tıbbi Bilgiler</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mikroçip No</label>
+                <input 
+                  type="text" 
+                  value={editFormData.medicalInfo?.microchipNo || ''}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, microchipNo: e.target.value }})}
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Doğum Tarihi</label>
+                <input 
+                  type="text" 
+                  placeholder="Örn: 12.04.2023"
+                  value={editFormData.medicalInfo?.birthDate || ''}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, birthDate: e.target.value }})}
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Cinsiyet & Kısırlaştırma</label>
+                <input 
+                  type="text" 
+                  placeholder="Örn: Erkek (Kısırlaştırılmış)"
+                  value={editFormData.medicalInfo?.gender || ''}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, gender: e.target.value }})}
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kan Grubu</label>
+                <input 
+                  type="text" 
+                  value={editFormData.medicalInfo?.bloodType || ''}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, bloodType: e.target.value }})}
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alerjiler (Virgülle ayırın)</label>
+                <input 
+                  type="text" 
+                  placeholder="Örn: Penisilin, Piliç Eti"
+                  value={editFormData.medicalInfo?.allergies || ''}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, allergies: e.target.value }})}
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+            </div>
+
             <div className="mt-8 flex justify-end gap-3">
               <button onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
                 İptal
@@ -339,6 +421,47 @@ export function PatientProfile() {
                 Kaydet
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Note Modal */}
+      {isNoteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-xl w-full p-6 animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-gray-900 mb-6">Yeni Tedavi Notu</h3>
+            <form onSubmit={handleAddNote} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Not Başlığı *</label>
+                <input 
+                  required
+                  type="text" 
+                  value={noteTitle}
+                  onChange={(e) => setNoteTitle(e.target.value)}
+                  placeholder="Örn: Genel Muayene Bulguları"
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Detaylı Not *</label>
+                <textarea 
+                  required
+                  value={noteContent}
+                  onChange={(e) => setNoteContent(e.target.value)}
+                  rows={4}
+                  placeholder="Muayene notlarını buraya girin..."
+                  className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
+                />
+              </div>
+              <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button type="button" onClick={() => setIsNoteModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                  İptal
+                </button>
+                <button type="submit" className="px-4 py-2 text-sm font-medium bg-[#1B4332] text-white rounded-lg hover:bg-[#122c21] transition-colors shadow-sm">
+                  Notu Kaydet
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

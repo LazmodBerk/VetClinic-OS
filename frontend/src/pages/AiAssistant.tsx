@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Brain, Bot, User, Sparkles, Loader2 } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 interface Message {
   id: number;
@@ -8,6 +9,7 @@ interface Message {
 }
 
 export function AiAssistant() {
+  const { patients, appointments, vaccines, inventoryItems, transactions } = useAppContext();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -47,13 +49,21 @@ export function AiAssistant() {
       const lowerInput = input.toLowerCase();
 
       if (lowerInput.includes('aşı') || lowerInput.includes('stok')) {
-        aiText = `Aşı ve stok verilerinizi analiz ettim:\n\n- **Kuduz Aşısı:** Stok tüketim hızı %40 arttı, önümüzdeki 4 gün içinde kritik seviyeye inebilir.\n- **Karma Aşı:** 80 doz mevcut, gelecek ay tahmini ihtiyaç 110 doz.\n- **Aksiyon Önerisi:** Hafta sonuna kadar yeni aşı siparişi vermeniz operasyonel aksaklıkları önleyecektir.`;
+        const criticalCount = inventoryItems.filter(i => i.status === 'Kritik').length;
+        const upcomingVaccines = vaccines.filter(v => v.status === 'Bekliyor' || v.status === 'Planlandı').length;
+        aiText = `Aşı ve stok verilerinizi analiz ettim:\n\n- **Kritik Stoklar:** Sistemde şu an ${criticalCount} adet kritik seviyede ürün bulunuyor.\n- **Bekleyen Aşılar:** Toplam ${upcomingVaccines} adet planlanmış/bekleyen aşı randevunuz var.\n- **Aksiyon Önerisi:** Kritik ürünlerin siparişini en kısa sürede vermeniz operasyonel aksaklıkları önleyecektir.`;
       } else if (lowerInput.includes('randevu') || lowerInput.includes('hasta')) {
-        aiText = `Hasta ve randevu yoğunluğunu inceledim:\n\n- **Bugünkü Randevular:** Toplam 8 randevunuz var, öğleden sonra (14:00 - 16:00 arası) yoğunluk zirvede.\n- **Hasta Sadakati:** Son 6 aydır ziyarete gelmeyen 42 kayıtlı hasta tespit ettim.\n- **Aksiyon Önerisi:** Gelmeyen hastalarınız için otomatik 'Özledik' SMS kampanyası başlatabiliriz.`;
+        const todayCount = appointments.filter(a => a.date === 'Bugün').length;
+        const totalPatients = patients.length;
+        aiText = `Hasta ve randevu yoğunluğunu inceledim:\n\n- **Kayıtlı Hastalar:** Sisteminizde toplam ${totalPatients} hasta bulunuyor.\n- **Bugünkü Randevular:** Bugün için ${todayCount > 0 ? todayCount + ' randevunuz var.' : 'henüz randevunuz görünmüyor.'}\n- **Genel Durum:** Hasta yönetim süreciniz stabil ilerliyor.`;
       } else if (lowerInput.includes('gelir') || lowerInput.includes('ciro') || lowerInput.includes('muhasebe') || lowerInput.includes('finans')) {
-        aiText = `Finansal metriklerinize dair analizim şu şekildedir:\n\n- **Aylık Gelir:** Bu ayki toplam ciro ₺142,500 seviyesinde, geçen aya göre %12 büyüme var.\n- **Net Kâr:** Giderler düşüldüğünde ₺94,300 kâr marjına ulaşıldı.\n- **Gelecek Tahmini:** Aynı ivme devam ederse, gelecek ay gelirinizin ₺155,000 barajını aşmasını öngörüyorum.`;
+        const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => {
+          const val = parseFloat(t.amount.replace(/[^0-9.-]+/g, ""));
+          return acc + (isNaN(val) ? 0 : val);
+        }, 0);
+        aiText = `Finansal metriklerinize dair analizim şu şekildedir:\n\n- **Toplam Gelir:** Kaydedilen güncel gelir toplamınız ₺${totalIncome.toLocaleString('tr-TR')} seviyesinde.\n- **Genel Durum:** Gelir-gider akışınız sistem üzerinden aktif şekilde izleniyor.`;
       } else {
-        aiText = `Sorunuzla ilgili yaptığım genel analiz sonucunda şu bilgileri derledim:\n\n- **Öncelikli Tespit:** İlgili konuda klinik verileriniz stabil görünmektedir.\n- **Sistem Durumu:** Tüm süreçler (hasta kayıt, stok ve finans) normal seyrinde ilerliyor.\n- **Not:** BulutVet AI, henüz test aşamasında (Demo) olduğu için bazı özel sorulara kalıplaşmış yanıtlar verebilir. Ancak gerçek sisteme geçildiğinde OpenAI/Gemini gibi motorlara bağlanarak gerçek zamanlı cevaplar üretecektir.\n\nDaha detaylı bir analiz isterseniz Raporlar sayfasını inceleyebilir veya bana (aşı, randevu, gelir gibi kelimeler kullanarak) yeni bir soru sorabilirsiniz!`;
+        aiText = `Sorunuzla ilgili yaptığım genel analiz sonucunda şu bilgileri derledim:\n\n- **Öncelikli Tespit:** İlgili konuda klinik verileriniz stabil görünmektedir.\n- **Sistem Durumu:** Tüm süreçler (hasta kayıt, stok ve finans) normal seyrinde ilerliyor.\n\nDaha detaylı bir analiz isterseniz bana (aşı, stok, hasta, randevu, gelir gibi kelimeler kullanarak) spesifik bir soru sorabilirsiniz!`;
       }
 
       const aiResponse: Message = {

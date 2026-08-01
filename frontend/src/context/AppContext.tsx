@@ -15,6 +15,14 @@ export interface Patient {
   lastVisit: string;
   weight: string;
   status: string;
+  medicalInfo?: {
+    microchipNo: string;
+    birthDate: string;
+    gender: string;
+    bloodType: string;
+    allergies: string;
+  };
+  notes?: { id: number; date: string; title: string; content: string }[];
 }
 
 export interface Appointment {
@@ -117,46 +125,12 @@ function usePersistedState<T>(key: string, defaultValue: T) {
 // ─────────────────────────────────────────────
 // VARSAYILAN VERİLER
 // ─────────────────────────────────────────────
-const DEFAULT_PATIENTS: Patient[] = [
-  { id: 1, name: 'Tarçın', species: 'Köpek', breed: 'Golden Retriever', owner: 'Ahmet Yılmaz', ownerGender: 'bay', phone: '5551234567', lastVisit: '12 Eki 2026', weight: '28 kg', status: 'Sağlıklı' },
-  { id: 2, name: 'Pamuk', species: 'Kedi', breed: 'Van Kedisi', owner: 'Ayşe Kaya', ownerGender: 'bayan', phone: '5559876543', lastVisit: '05 Eyl 2026', weight: '4.2 kg', status: 'Tedavide' },
-  { id: 3, name: 'Cesur', species: 'Köpek', breed: 'Kangal', owner: 'Mehmet Demir', ownerGender: 'bay', phone: '5553456789', lastVisit: '20 Ağu 2026', weight: '45 kg', status: 'Sağlıklı' },
-  { id: 4, name: 'Limon', species: 'Kuş', breed: 'Muhabbet', owner: 'Zeynep Arslan', ownerGender: 'bayan', phone: '5553456789', lastVisit: '27 Tem 2026', weight: '0.1 kg', status: 'Kontrol Bekliyor' },
-];
-
-const DEFAULT_APPOINTMENTS: Appointment[] = [
-  { id: 1, patient: 'Tarçın', owner: 'Ahmet Yılmaz', type: 'Muayene', date: 'Bugün', time: '10:00', status: 'Bekliyor', color: 'bg-blue-100 text-blue-800' },
-  { id: 2, patient: 'Pamuk', owner: 'Ayşe Kaya', type: 'Aşı (Karma)', date: 'Bugün', time: '11:30', status: 'Tamamlandı', color: 'bg-green-100 text-green-800' },
-  { id: 3, patient: 'Cesur', owner: 'Mehmet Demir', type: 'Operasyon', date: 'Yarın', time: '09:00', status: 'Onaylandı', color: 'bg-indigo-100 text-indigo-800' },
-  { id: 4, patient: 'Maya', owner: 'Zeynep Çelik', type: 'Kontrol', date: 'Yarın', time: '14:15', status: 'İptal', color: 'bg-red-100 text-red-800' },
-];
-
-const DEFAULT_VACCINES: Vaccine[] = [
-  { id: 1, patient: 'Tarçın', owner: 'Ahmet Yılmaz', vaccine: 'Kuduz', date: 'Bugün', status: 'Bekliyor' },
-  { id: 2, patient: 'Pamuk', owner: 'Ayşe Kaya', vaccine: 'Karma', date: 'Yarın', status: 'Planlandı' },
-  { id: 3, patient: 'Cesur', owner: 'Mehmet Demir', vaccine: 'Lyme', date: '21 Eki 2026', status: 'Gecikmiş' },
-];
-
-const DEFAULT_INVENTORY: InventoryItem[] = [
-  { id: 1, name: 'Kuduz Aşısı (Nobivac)', category: 'Aşılar', stock: 5, minStock: 10, unit: 'Doz', price: '₺250', status: 'Kritik' },
-  { id: 2, name: 'Karma Aşı', category: 'Aşılar', stock: 42, minStock: 15, unit: 'Doz', price: '₺300', status: 'Yeterli' },
-  { id: 3, name: 'Pire Damlası (10-20kg)', category: 'İlaçlar', stock: 12, minStock: 20, unit: 'Kutu', price: '₺450', status: 'Azalıyor' },
-  { id: 4, name: 'Steril Eldiven (M)', category: 'Sarf Malzeme', stock: 50, minStock: 10, unit: 'Kutu', price: '₺120', status: 'Yeterli' },
-];
-
-const DEFAULT_TRANSACTIONS: Transaction[] = [
-  { id: 1, date: '29 Tem 2026', description: 'Muayene ve Aşı Ücreti (Maya)', type: 'income', amount: '+₺1,450', method: 'Kredi Kartı', eInvoice: true },
-  { id: 2, date: '28 Tem 2026', description: 'VetDepo A.Ş. İlaç Alımı', type: 'expense', amount: '-₺8,200', method: 'Havale/EFT', eInvoice: false },
-  { id: 3, date: '28 Tem 2026', description: 'Tıraş ve Bakım (Paşa)', type: 'income', amount: '+₺450', method: 'Nakit', eInvoice: true },
-  { id: 4, date: '27 Tem 2026', description: 'Klinik Elektrik Faturası', type: 'expense', amount: '-₺1,120', method: 'Otomatik Ödeme', eInvoice: false },
-];
-
-const DEFAULT_FARM: FarmAnimal[] = [
-  { id: 1, tagNo: 'TR-42-0001', type: 'İnek', breed: 'Holstein', status: 'Gebe', nextCheckup: '15 Kas 2026', inseminationDate: '15 Şub 2026' },
-  { id: 2, tagNo: 'TR-42-0002', type: 'İnek', breed: 'Simental', status: 'Tohumlama Bekliyor', nextCheckup: 'Bugün', inseminationDate: '-' },
-  { id: 3, tagNo: 'TR-42-0003', type: 'Buzağı', breed: 'Holstein', status: 'Sağlıklı', nextCheckup: '20 Ara 2026', inseminationDate: '-' },
-  { id: 4, tagNo: 'TR-42-0004', type: 'İnek', breed: 'Holstein', status: 'Tedavi (Mastitis)', nextCheckup: 'Yarın', inseminationDate: '01 Oca 2026' },
-];
+const DEFAULT_PATIENTS: Patient[] = [];
+const DEFAULT_APPOINTMENTS: Appointment[] = [];
+const DEFAULT_VACCINES: Vaccine[] = [];
+const DEFAULT_INVENTORY: InventoryItem[] = [];
+const DEFAULT_TRANSACTIONS: Transaction[] = [];
+const DEFAULT_FARM: FarmAnimal[] = [];
 
 const DEFAULT_SETTINGS: SettingsData = {
   clinicName: 'BulutVet Premium Klinik',
@@ -181,18 +155,25 @@ interface AppContextType {
 
   vaccines: Vaccine[];
   addVaccine: (vaccine: Omit<Vaccine, 'id'>) => void;
+  updateVaccine: (vaccine: Vaccine) => void;
+  deleteVaccine: (id: number) => void;
 
   inventoryItems: InventoryItem[];
   addInventoryItem: (item: Omit<InventoryItem, 'id'>) => void;
+  updateInventoryItem: (item: InventoryItem) => void;
+  deleteInventoryItem: (id: number) => void;
 
   transactions: Transaction[];
-  addTransaction: (tx: Omit<Transaction, 'id'>) => void;
+  addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
+
+  settings: SettingsData;
+  updateSettings: (settings: SettingsData) => void;
 
   farmAnimals: FarmAnimal[];
   addFarmAnimal: (animal: Omit<FarmAnimal, 'id'>) => void;
 
-  settings: SettingsData;
-  updateSettings: (s: SettingsData) => void;
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -209,12 +190,38 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [farmAnimals,   setFarmAnimals]   = usePersistedState<FarmAnimal[]>('farm',        DEFAULT_FARM);
   const [settings,      setSettings]      = usePersistedState<SettingsData>('settings',    DEFAULT_SETTINGS);
 
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const savedTheme = localStorage.getItem('canvet_theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      return savedTheme;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('canvet_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   const addPatient       = (p: Omit<Patient, 'id'>)       => setPatients(prev => [{ ...p, id: Date.now() }, ...prev]);
   const updatePatient    = (p: Patient)                    => setPatients(prev => prev.map(pt => pt.id === p.id ? p : pt));
   const deletePatient    = (id: number)                    => setPatients(prev => prev.filter(p => p.id !== id));
   const addAppointment   = (a: Omit<Appointment, 'id'>)   => setAppointments(prev => [{ ...a, id: Date.now() }, ...prev]);
   const addVaccine       = (v: Omit<Vaccine, 'id'>)       => setVaccines(prev => [{ ...v, id: Date.now() }, ...prev]);
+  const updateVaccine    = (v: Vaccine)                   => setVaccines(prev => prev.map(vc => vc.id === v.id ? v : vc));
+  const deleteVaccine    = (id: number)                   => setVaccines(prev => prev.filter(v => v.id !== id));
   const addInventoryItem = (i: Omit<InventoryItem, 'id'>) => setInventoryItems(prev => [{ ...i, id: Date.now() }, ...prev]);
+  const updateInventoryItem = (i: InventoryItem) => setInventoryItems(prev => prev.map(item => item.id === i.id ? i : item));
+  const deleteInventoryItem = (id: number) => setInventoryItems(prev => prev.filter(i => i.id !== id));
   const addTransaction   = (t: Omit<Transaction, 'id'>)   => setTransactions(prev => [{ ...t, id: Date.now() }, ...prev]);
   const addFarmAnimal    = (f: Omit<FarmAnimal, 'id'>)    => setFarmAnimals(prev => [{ ...f, id: Date.now() }, ...prev]);
   const updateSettings   = (s: SettingsData)               => setSettings(s);
@@ -223,11 +230,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider value={{
       patients, addPatient, updatePatient, deletePatient,
       appointments, addAppointment,
-      vaccines, addVaccine,
-      inventoryItems, addInventoryItem,
+      vaccines, addVaccine, updateVaccine, deleteVaccine,
+      inventoryItems, addInventoryItem, updateInventoryItem, deleteInventoryItem,
       transactions, addTransaction,
       farmAnimals, addFarmAnimal,
       settings, updateSettings,
+      theme, toggleTheme
     }}>
       {children}
     </AppContext.Provider>

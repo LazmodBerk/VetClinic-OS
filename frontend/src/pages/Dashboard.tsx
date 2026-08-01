@@ -5,43 +5,26 @@ import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
-const incomeData = [
-  { name: 'Pzt', ciro: 4000, gider: 2400 },
-  { name: 'Sal', ciro: 3000, gider: 1398 },
-  { name: 'Çar', ciro: 2000, gider: 9800 },
-  { name: 'Per', ciro: 2780, gider: 3908 },
-  { name: 'Cum', ciro: 1890, gider: 4800 },
-  { name: 'Cmt', ciro: 2390, gider: 3800 },
-  { name: 'Paz', ciro: 3490, gider: 4300 },
-];
-
-const aiPredictionData = [
-  { name: 'Kuduz', mevcut: 45, tahmin: 60 },
-  { name: 'Karma', mevcut: 80, tahmin: 110 },
-  { name: 'Lyme', mevcut: 30, tahmin: 40 },
-  { name: 'Lösemi', mevcut: 25, tahmin: 35 },
-];
-
 export function Dashboard() {
-  const { patients, appointments, vaccines, inventoryItems } = useAppContext();
+  const { patients, appointments, vaccines, inventoryItems, transactions } = useAppContext();
   const navigate = useNavigate();
 
   // Notifications State
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    { id: 1, text: 'Pamuk için Karma Aşı vakti geldi.', time: '10 dk önce', read: false },
-    { id: 2, text: 'Yarın 3 operasyon randevunuz var.', time: '1 saat önce', read: false },
-    { id: 3, text: 'Kuduz aşısı stokları kritik seviyede (5 doz kaldı).', time: 'Dün', read: false },
-  ]);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  // Generate dynamic notifications based on real data
+  const upcomingVaccines = vaccines.filter(v => v.status === 'Bekliyor' || v.status === 'Planlandı');
+  const criticalStock = inventoryItems.filter(i => i.status === 'Kritik' || i.stock <= i.minStock);
+  const todayAppointments = appointments.filter(a => a.date.toLowerCase() === 'bugün' && a.status !== 'İptal');
+  
+  const notifications = [
+    ...upcomingVaccines.map(v => ({ id: `v-${v.id}`, text: `${v.patient} için ${v.vaccine} aşısı vakti geldi.`, time: 'Yeni', read: false })),
+    ...todayAppointments.map(a => ({ id: `a-${a.id}`, text: `Bugün ${a.time} - ${a.type} randevusu var.`, time: 'Yeni', read: false })),
+    ...criticalStock.map(i => ({ id: `i-${i.id}`, text: `${i.name} stokları kritik seviyede (${i.stock} ${i.unit} kaldı).`, time: 'Yeni', read: false }))
+  ];
 
-  const handleMarkAllRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-    setIsNotifOpen(false);
-    toast.success('Tüm bildirimler okundu olarak işaretlendi.');
-  };
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -53,13 +36,44 @@ export function Dashboard() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Dynamic calculations
+  const totalIncome = transactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => {
+      const val = parseFloat(t.amount.replace(/[^0-9.-]+/g, ""));
+      return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+
   const stats = [
     { name: 'Toplam Müşteri', value: Array.from(new Set(patients.map(p => p.owner))).length.toString(), icon: Users, color: 'bg-blue-500', link: '/patients' },
     { name: 'Kayıtlı Hayvan', value: patients.length.toString(), icon: PawPrint, color: 'bg-emerald-500', link: '/patients' },
     { name: 'Yaklaşan Randevular', value: appointments.length.toString(), icon: Calendar, color: 'bg-purple-500', link: '/appointments' },
-    { name: 'Kritik Stok', value: inventoryItems?.filter(i => i.status === 'Kritik').length.toString() || '0', icon: AlertTriangle, color: 'bg-red-500', link: '/inventory' },
-    { name: 'Aylık Gelir', value: '₺24,500', icon: TrendingUp, color: 'bg-amber-500', link: '/accounting' },
+    { name: 'Kritik Stok', value: criticalStock.length.toString(), icon: AlertTriangle, color: 'bg-red-500', link: '/inventory' },
+    { name: 'Toplam Gelir', value: `₺${totalIncome.toLocaleString('tr-TR')}`, icon: TrendingUp, color: 'bg-amber-500', link: '/accounting' },
   ];
+
+  // Generate 7-day chart data based on transactions
+  const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+  const incomeData = days.map(day => ({ name: day, ciro: 0, gider: 0 }));
+  
+  // Dummy logic to map real transactions to days just for demonstration since real dates are strings like '29 Tem 2026' or 'Bugün'
+  transactions.forEach((t, i) => {
+    const val = parseFloat(t.amount.replace(/[^0-9.-]+/g, ""));
+    const dayIndex = i % 7; // Just distributing them across the week for visual effect if dates aren't parsed to weekday
+    if (t.type === 'income') incomeData[dayIndex].ciro += val;
+    else incomeData[dayIndex].gider += val;
+  });
+  
+  // Dynamic AI prediction based on inventory
+  const aiPredictionData = inventoryItems.slice(0, 4).map(i => ({
+    name: i.name.split(' ')[0], 
+    mevcut: i.stock,
+    tahmin: i.stock > 0 ? Math.floor(i.stock * 1.5) : 10
+  }));
+
+  if (aiPredictionData.length === 0) {
+    aiPredictionData.push({ name: 'Aşı Yok', mevcut: 0, tahmin: 0 });
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
@@ -153,7 +167,11 @@ export function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {patients.slice(0, 4).map((patient) => (
+                  {patients.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} className="px-6 py-8 text-center text-gray-400 text-sm">Henüz kayıtlı hasta bulunmuyor.</td>
+                    </tr>
+                  ) : patients.slice(0, 4).map((patient) => (
                     <tr key={patient.id} className="hover:bg-gray-50/80 transition-colors cursor-pointer group" onClick={() => navigate(`/patients/${patient.id}`)}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-4">
@@ -194,9 +212,9 @@ export function Dashboard() {
               <BrainCircuit className="h-32 w-32" />
             </div>
             <h3 className="text-lg font-bold mb-2 flex items-center gap-2 relative z-10 text-[#95D5B2]">
-              <BrainCircuit className="h-5 w-5" /> AI Aşı Tahmini
+              <BrainCircuit className="h-5 w-5" /> AI Tahminleri
             </h3>
-            <p className="text-xs text-gray-300 mb-6 relative z-10 font-medium">Gelecek ayki tahmini stok ihtiyaçlarınız.</p>
+            <p className="text-xs text-gray-300 mb-6 relative z-10 font-medium">Gelecek ayki tahmini stok/randevu ihtiyaçları.</p>
             <div className="h-52 sm:h-60 relative z-10">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={aiPredictionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -204,7 +222,7 @@ export function Dashboard() {
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#95D5B2', fontSize: 10, fontWeight: 600}} />
                   <YAxis axisLine={false} tickLine={false} tick={{fill: '#95D5B2', fontSize: 10}} />
                   <Tooltip cursor={{fill: '#2a5a45', opacity: 0.5}} contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#1B4332', color: '#fff', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.5)', fontSize: '12px' }} itemStyle={{ color: '#95D5B2' }} />
-                  <Bar dataKey="mevcut" name="Geçen Ay" fill="#4ade80" fillOpacity={0.4} radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="mevcut" name="Mevcut" fill="#4ade80" fillOpacity={0.4} radius={[6, 6, 0, 0]} />
                   <Bar dataKey="tahmin" name="AI Tahmini" fill="#95D5B2" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

@@ -5,7 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { Modal } from '../components/Modal';
 
 export function Vaccines() {
-  const { vaccines, addVaccine, patients } = useAppContext();
+  const { vaccines, addVaccine, updateVaccine, patients } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [patientName, setPatientName] = useState('');
@@ -107,15 +107,24 @@ export function Vaccines() {
                     <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-md ${
                       vaccine.status === 'Bekliyor' ? 'bg-amber-100 text-amber-800' :
                       vaccine.status === 'Gecikmiş' ? 'bg-red-100 text-red-800' :
+                      vaccine.status === 'Uygulandı' ? 'bg-green-100 text-green-800' :
                       'bg-blue-100 text-blue-800'
                     }`}>
                       {vaccine.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => toast.success('Demo: Aşı uygulandı olarak işaretlendi.')} className="text-green-600 hover:text-green-900 font-semibold bg-green-50 px-3 py-1.5 rounded-lg transition-colors mr-2">
-                      Uygulandı Yap
-                    </button>
+                    {vaccine.status !== 'Uygulandı' && (
+                      <button onClick={() => {
+                        updateVaccine({ ...vaccine, status: 'Uygulandı' });
+                        toast.success('Aşı uygulandı olarak işaretlendi.');
+                      }} className="text-green-600 hover:text-green-900 font-semibold bg-green-50 px-3 py-1.5 rounded-lg transition-colors mr-2">
+                        Uygulandı Yap
+                      </button>
+                    )}
+                    {vaccine.status === 'Uygulandı' && (
+                      <span className="text-green-600 font-semibold px-3 py-1.5">Tamamlandı</span>
+                    )}
                   </td>
                 </tr>
               ))}

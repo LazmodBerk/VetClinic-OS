@@ -12,6 +12,7 @@ export function Farm() {
   const [type, setType] = useState('İnek');
   const [breed, setBreed] = useState('');
   const [status, setStatus] = useState('Sağlıklı');
+  const [search, setSearch] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,11 +118,8 @@ export function Farm() {
           <div className="flex gap-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-              <input type="text" placeholder="Küpe No Ara..." className="w-full border rounded-lg border-gray-300 text-sm focus:ring-[#1B4332] focus:border-[#1B4332] py-2 pl-9 pr-3" />
+              <input value={search} onChange={e => setSearch(e.target.value)} type="text" placeholder="Küpe No Ara..." className="w-full border rounded-lg border-gray-300 text-sm focus:ring-[#1B4332] focus:border-[#1B4332] py-2 pl-9 pr-3" />
             </div>
-            <button onClick={() => toast.info('Demo: Filtreler açıldı')} className="flex items-center justify-center rounded-lg bg-white px-3 py-2 text-gray-500 hover:text-gray-700 shadow-sm border border-gray-200 transition-colors">
-              <Filter className="h-4 w-4" />
-            </button>
           </div>
         </div>
 
@@ -138,7 +136,7 @@ export function Farm() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {farmAnimals.map((animal) => (
+              {farmAnimals.filter(a => a.tagNo.toLowerCase().includes(search.toLowerCase())).map((animal) => (
                 <tr key={animal.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">

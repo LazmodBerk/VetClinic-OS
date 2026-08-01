@@ -19,7 +19,7 @@ function openWhatsApp(phone: string | undefined, message: string) {
 // ────────────────────────────────────────────────────────────
 
 export function Appointments() {
-  const { appointments, addAppointment, patients } = useAppContext();
+  const { appointments, addAppointment, patients, addTransaction } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
@@ -27,6 +27,7 @@ export function Appointments() {
   const [type, setType] = useState('Muayene');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [price, setPrice] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +35,19 @@ export function Appointments() {
     const existing = patients.find(p => p.name.toLowerCase() === patientName.toLowerCase());
     const owner = existing ? existing.owner : 'Bilinmiyor';
     addAppointment({ patient: patientName, owner, type, date, time, status: 'Bekliyor', color: 'bg-blue-100 text-blue-800' });
+    
+    // İşlem ücreti girildiyse otomatik muhasebeye işle
+    if (price && Number(price) > 0) {
+      addTransaction({
+        date: date === 'Bugün' ? new Date().toLocaleDateString('tr-TR') : date,
+        description: `${type} Ücreti (${patientName})`,
+        type: 'income',
+        amount: `+₺${price}`,
+        method: 'Nakit',
+        eInvoice: false
+      });
+      toast.success('İşlem ücreti muhasebeye Gelir olarak kaydedildi.');
+    }
     
     // Randevu eklendikten sonra WhatsApp onay mesajı göndermeyi teklif et
     if (existing?.phone) {
@@ -47,7 +61,7 @@ export function Appointments() {
     
     toast.success('Randevu başarıyla eklendi!');
     setIsModalOpen(false);
-    setPatientName(''); setType('Muayene'); setDate(''); setTime('');
+    setPatientName(''); setType('Muayene'); setDate(''); setTime(''); setPrice('');
   };
 
   const statusConfig: Record<string, { color: string; icon: React.ReactNode }> = {
@@ -177,12 +191,17 @@ export function Appointments() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Saat *</label>
               <input required value={time} onChange={e => setTime(e.target.value)} type="time" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" />
             </div>
-            <div className="col-span-2">
+            <div className="col-span-2 sm:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">İşlem Tipi</label>
               <select value={type} onChange={e => setType(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]">
                 <option>Muayene</option><option>Aşı (Karma)</option><option>Aşı (Kuduz)</option>
                 <option>Kontrol</option><option>Operasyon</option><option>Tıraş & Bakım</option>
               </select>
+            </div>
+            <div className="col-span-2 sm:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">İşlem Ücreti (₺)</label>
+              <input value={price} onChange={e => setPrice(e.target.value)} type="number" step="0.01" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" placeholder="Örn: 450" />
+              <p className="text-[10px] text-gray-400 mt-1">Doldurulursa muhasebeye eklenir.</p>
             </div>
           </div>
           <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">
