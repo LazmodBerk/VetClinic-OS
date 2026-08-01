@@ -1,5 +1,5 @@
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Tractor, Smartphone, Home, CheckCircle2, Clock, Brain, Moon, Sun, Globe } from 'lucide-react';
+import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Tractor, Smartphone, Home, CheckCircle2, Clock, Brain, Moon, Sun, Globe, User, LogOut } from 'lucide-react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { useState, useRef, useEffect } from 'react';
 import { Dashboard } from './pages/Dashboard';
@@ -96,12 +96,14 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 
   // Global Notifications State
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     { id: 1, text: 'Pamuk için Karma Aşı vakti geldi.', time: '10 dk önce', read: false },
     { id: 2, text: 'Yarın 3 operasyon randevunuz var.', time: '1 saat önce', read: false },
     { id: 3, text: 'Kuduz aşısı stokları kritik seviyede (5 doz kaldı).', time: 'Dün', read: false },
   ]);
   const notifRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -111,10 +113,17 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     toast.success('Tüm bildirimler okundu olarak işaretlendi.');
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
         setIsNotifOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -173,14 +182,36 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             <Smartphone className="h-4 w-4" />
             Hasta Portalı'nı Aç
           </Link>
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#2a5a45] transition-colors cursor-pointer border border-transparent hover:border-[#95D5B2]/20">
-            <div className="h-10 w-10 rounded-full bg-[#95D5B2] flex items-center justify-center text-[#1B4332] font-bold shadow-md ring-2 ring-white/10">
-              Dr
+          <div className="relative" ref={profileRef}>
+            <div 
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#2a5a45] transition-colors cursor-pointer border border-transparent hover:border-[#95D5B2]/20"
+            >
+              <div className="h-10 w-10 rounded-full bg-[#95D5B2] flex items-center justify-center text-[#1B4332] font-bold shadow-md ring-2 ring-white/10">
+                Dr
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-white line-clamp-1">{settings.clinicName}</p>
+                <p className="text-xs text-[#95D5B2]">Klinik Yöneticisi</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-white">Dr. Buğra Can Sefer</p>
-              <p className="text-xs text-[#95D5B2]">Veteriner Hekim</p>
-            </div>
+            
+            {isProfileMenuOpen && (
+              <div className="absolute bottom-full left-0 mb-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-bottom-2">
+                <div className="px-4 py-2 border-b border-gray-100 mb-1">
+                  <p className="text-sm font-semibold text-gray-900 line-clamp-1">{settings.clinicName}</p>
+                  <p className="text-xs text-gray-500">{settings.email}</p>
+                </div>
+                <button onClick={() => { setIsProfileMenuOpen(false); navigate('/settings'); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Profil & Ayarlar
+                </button>
+                <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                  <LogOut className="h-4 w-4" />
+                  Çıkış Yap
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </aside>
