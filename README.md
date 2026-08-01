@@ -54,14 +54,6 @@ Proje, sıradan beyaz/mavi klinik yazılımlarından sıyrılıp, güven ve prof
 - **Secondary:** Terracotta (`#E07A5F`)
 - **Tipografi:** Başlıklar için `Playfair Display` (Serif), gövde metinleri için `DM Sans` (Sans-serif).
 
-## 🤝 Katkıda Bulunma (Contributing)
-Proje tamamen açık kaynaktır ve pull request'lere (PR) açıktır! Eğer katkıda bulunmak isterseniz:
-1. Bu projeyi fork'layın.
-2. Yeni bir feature branch oluşturun (`git checkout -b feature/AmazingFeature`).
-3. Değişikliklerinizi commit edin (`git commit -m 'Add some AmazingFeature'`).
-4. Branch'inize push'layın (`git push origin feature/AmazingFeature`).
-5. Bir Pull Request açın.
-
 ## 📝 Lisans
 Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır. Dilediğiniz gibi kullanabilir ve geliştirebilirsiniz.
 
