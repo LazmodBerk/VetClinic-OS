@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, MoreVertical, Calendar, User, Syringe, Trash2 } from 'lucide-react';
+import { Search, Plus, MoreVertical, Calendar, User, Syringe, Trash2, Phone, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppContext, honorific } from '../context/AppContext';
 import { Modal } from '../components/Modal';
