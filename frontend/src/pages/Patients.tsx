@@ -35,10 +35,11 @@ export function Patients() {
   const [ownerGender, setOwnerGender] = useState<'bay' | 'bayan'>('bay');
   const [phone, setPhone] = useState('');
   const [weight, setWeight] = useState('');
+  const [age, setAge] = useState('');
 
   const resetForm = () => {
     setName(''); setSpecies('Köpek'); setBreed('');
-    setOwner(''); setOwnerGender('bay'); setPhone(''); setWeight('');
+    setOwner(''); setOwnerGender('bay'); setPhone(''); setWeight(''); setAge('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +50,7 @@ export function Patients() {
       await addPatient({
         name, species,
         breed: breed || 'Belirtilmedi',
+        age: age || 'Bilinmiyor',
         owner, ownerGender, phone,
         weight: weight ? `${weight} kg` : '-',
         lastVisit: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
@@ -166,8 +168,8 @@ export function Patients() {
                     <span className="font-medium text-gray-900">{patient.lastVisit}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Ağırlık:</span>
-                    <span className="font-medium text-gray-900">{patient.weight}</span>
+                    <span className="text-gray-500">Yaş / Kilo:</span>
+                    <span className="font-medium text-gray-900">{patient.age || '-'} / {patient.weight}</span>
                   </div>
                 </div>
 
@@ -246,6 +248,11 @@ export function Patients() {
             <div className="col-span-2 sm:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">📱 Telefon (WhatsApp)</label>
               <input value={phone} onChange={e => setPhone(e.target.value)} type="tel" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" placeholder="5551234567" />
+            </div>
+            {/* Yaş */}
+            <div className="col-span-2 sm:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Yaş (Ay/Yıl)</label>
+              <input value={age} onChange={e => setAge(e.target.value)} type="text" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]" placeholder="Örn: 2 Yaş" />
             </div>
             {/* Kilo */}
             <div className="col-span-2 sm:col-span-1">
