@@ -113,24 +113,24 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
       </div>
 
       {/* Sağ Taraf: Glass Efektli Form */}
-      <div className="w-full lg:w-[500px] xl:w-[600px] bg-white/75 backdrop-blur-xl border-l border-white/40 shadow-[0_0_40px_rgba(0,0,0,0.1)] flex flex-col justify-center p-8 sm:p-12 z-20 relative">
+      <div className="w-full lg:w-[500px] xl:w-[600px] bg-white/90 backdrop-blur-2xl border-l border-white/60 shadow-[0_0_50px_rgba(0,0,0,0.15)] flex flex-col justify-center p-8 sm:p-12 z-20 relative">
         <div className="w-full max-w-md mx-auto">
           <div className="flex items-center gap-4 mb-10">
             <div className="h-14 w-14 bg-gradient-to-br from-[#1B4332] to-[#2a5a45] rounded-2xl flex items-center justify-center shadow-xl transform rotate-3 hover:rotate-6 transition-transform border border-white/20">
               <Stethoscope className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight drop-shadow-sm">
+              <h2 className="text-4xl font-black text-black tracking-tight drop-shadow-sm">
                 CanVet<span className="text-[#1B4332]">.</span>
               </h2>
-              <p className="text-sm font-medium text-[#1B4332]/80 mt-1">Modern Klinik Yönetimi</p>
+              <p className="text-sm font-bold text-[#1B4332] mt-1">Modern Klinik Yönetimi</p>
             </div>
           </div>
           
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-black text-black">
             {isLogin ? 'Kliniğinize giriş yapın' : 'Yeni klinik hesabı oluşturun'}
           </h2>
-          <p className="mt-2 text-sm text-gray-700 font-medium">
+          <p className="mt-2 text-sm text-gray-800 font-bold">
             {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
             <button onClick={() => setIsLogin(!isLogin)} className="font-bold text-[#1B4332] hover:text-[#2a5a45] ml-1 transition-colors underline decoration-2 underline-offset-4">
               {isLogin ? 'Ücretsiz Kayıt Olun' : 'Buradan Giriş Yapın'}
@@ -141,7 +141,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
             <form className="space-y-6" onSubmit={handleAuth}>
               {!isLogin && (
                 <div>
-                  <label className="block text-sm font-bold text-gray-800 mb-2">İsim Soyisim</label>
+                  <label className="block text-sm font-black text-black mb-2">İsim Soyisim</label>
                   <div className="relative rounded-xl shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <User className="h-5 w-5 text-gray-500" />
@@ -151,7 +151,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="block w-full pl-12 pr-4 py-4 sm:text-sm border-0 rounded-xl bg-white/70 focus:bg-white focus:ring-2 focus:ring-[#1B4332] transition-all placeholder-gray-400 font-medium text-gray-900 shadow-inner"
+                      className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
                       placeholder="Dr. Ad Soyad"
                     />
                   </div>
@@ -159,7 +159,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
               )}
               
               <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">E-Posta Adresi</label>
+                <label className="block text-sm font-black text-black mb-2">E-Posta Adresi</label>
                 <div className="relative rounded-xl shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Mail className="h-5 w-5 text-gray-500" />
@@ -169,14 +169,14 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-4 sm:text-sm border-0 rounded-xl bg-white/70 focus:bg-white focus:ring-2 focus:ring-[#1B4332] transition-all placeholder-gray-400 font-medium text-gray-900 shadow-inner"
+                    className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
                     placeholder="ornek@klinik.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">Şifre</label>
+                <label className="block text-sm font-black text-black mb-2">Şifre</label>
                 <div className="relative rounded-xl shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-500" />
@@ -186,7 +186,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-4 sm:text-sm border-0 rounded-xl bg-white/70 focus:bg-white focus:ring-2 focus:ring-[#1B4332] transition-all placeholder-gray-400 font-medium text-gray-900 shadow-inner"
+                    className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
                     placeholder="••••••••"
                   />
                 </div>
