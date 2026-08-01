@@ -76,44 +76,45 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[url('/happy_pets_garden.jpg')] bg-cover bg-center bg-no-repeat relative">
+    <div className="min-h-screen w-full flex bg-gradient-to-br from-slate-900 via-[#1B4332] to-slate-900 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('/happy_pets_garden.jpg')] bg-cover bg-center bg-no-repeat opacity-30 mix-blend-overlay"></div>
       <Toaster position="top-center" richColors />
       
       {/* Sol Taraf: Yorumlar ve Boşluk */}
-      <div className="hidden lg:flex flex-1 flex-col justify-end p-12 relative z-10">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
+      <div className="hidden lg:flex flex-1 flex-col justify-end p-16 relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
         
         <div className="max-w-2xl relative z-20">
-          <Quote className="h-12 w-12 text-[#95D5B2] opacity-90 mb-6 transform -scale-x-100 drop-shadow-lg" />
+          <Quote className="h-14 w-14 text-[#95D5B2] opacity-100 mb-8 transform -scale-x-100 drop-shadow-2xl" />
           
-          <div className="min-h-[160px] transition-all duration-500 ease-in-out">
-            <p className="text-3xl font-semibold leading-snug mb-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <div className="min-h-[160px] transition-all duration-700 ease-in-out">
+            <p className="text-4xl font-bold leading-tight mb-8 text-white drop-shadow-md">
               "{testimonials[currentTestimonial].text}"
             </p>
             
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xl font-bold text-white drop-shadow-md">{testimonials[currentTestimonial].author}</p>
-                <p className="text-md font-medium text-[#95D5B2] drop-shadow-md">{testimonials[currentTestimonial].clinic}</p>
+                <p className="text-2xl font-bold text-white tracking-wide">{testimonials[currentTestimonial].author}</p>
+                <p className="text-lg font-medium text-[#95D5B2] tracking-wide mt-1">{testimonials[currentTestimonial].clinic}</p>
               </div>
               
-              <div className="flex items-center gap-3">
-                <button onClick={prevTestimonial} className="p-3 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md transition-colors border border-white/20 text-white">
-                  <ChevronLeft className="h-5 w-5" />
+              <div className="flex items-center gap-4">
+                <button onClick={prevTestimonial} className="p-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl transition-all border border-white/20 text-white shadow-xl hover:scale-105 active:scale-95">
+                  <ChevronLeft className="h-6 w-6" />
                 </button>
-                <button onClick={nextTestimonial} className="p-3 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md transition-colors border border-white/20 text-white">
-                  <ChevronRight className="h-5 w-5" />
+                <button onClick={nextTestimonial} className="p-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl transition-all border border-white/20 text-white shadow-xl hover:scale-105 active:scale-95">
+                  <ChevronRight className="h-6 w-6" />
                 </button>
               </div>
             </div>
           </div>
           
           {/* Dots */}
-          <div className="flex gap-2 mt-8">
+          <div className="flex gap-3 mt-10">
             {testimonials.map((_, idx) => (
               <div 
                 key={idx} 
-                className={`h-1.5 rounded-full transition-all duration-300 ${currentTestimonial === idx ? 'w-8 bg-[#95D5B2]' : 'w-2 bg-white/50'}`} 
+                className={`h-2 rounded-full transition-all duration-500 shadow-lg ${currentTestimonial === idx ? 'w-10 bg-[#95D5B2]' : 'w-2 bg-white/30'}`} 
               />
             ))}
           </div>
@@ -121,101 +122,101 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
       </div>
 
       {/* Sağ Taraf: Glass Efektli Form */}
-      <div className="w-full lg:w-[500px] xl:w-[600px] bg-white/90 backdrop-blur-2xl border-l border-white/60 shadow-[0_0_50px_rgba(0,0,0,0.15)] flex flex-col justify-center p-8 sm:p-12 z-20 relative">
+      <div className="w-full lg:w-[550px] xl:w-[650px] bg-white/95 backdrop-blur-3xl border-l border-white/40 shadow-[-20px_0_50px_rgba(0,0,0,0.3)] flex flex-col justify-center p-8 sm:p-16 z-20 relative">
         <div className="w-full max-w-md mx-auto">
-          <div className="flex items-center gap-4 mb-10">
-            <div className="h-14 w-14 bg-gradient-to-br from-[#1B4332] to-[#2a5a45] rounded-2xl flex items-center justify-center shadow-xl transform rotate-3 hover:rotate-6 transition-transform border border-white/20">
-              <Stethoscope className="h-7 w-7 text-white" />
+          <div className="flex items-center gap-5 mb-12">
+            <div className="h-16 w-16 bg-gradient-to-br from-[#1B4332] to-[#40916C] rounded-2xl flex items-center justify-center shadow-2xl transform -rotate-3 hover:rotate-3 transition-transform duration-300 border border-[#1B4332]/20">
+              <Stethoscope className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h2 className="text-4xl font-black text-black tracking-tight drop-shadow-sm">
+              <h2 className="text-5xl font-black text-slate-900 tracking-tight drop-shadow-sm">
                 CanVet<span className="text-[#1B4332]">.</span>
               </h2>
-              <p className="text-sm font-bold text-[#1B4332] mt-1">Modern Klinik Yönetimi</p>
+              <p className="text-sm font-bold text-[#40916C] mt-1 tracking-wider uppercase">Modern Klinik Yönetimi</p>
             </div>
           </div>
           
-          <h2 className="text-2xl font-black text-black">
-            {isForgotPassword ? 'Şifrenizi Sıfırlayın' : (isLogin ? 'Kliniğinize giriş yapın' : 'Yeni klinik hesabı oluşturun')}
+          <h2 className="text-3xl font-black text-slate-900 mb-2">
+            {isForgotPassword ? 'Şifrenizi Sıfırlayın' : (isLogin ? 'Hoş Geldiniz' : 'Hesap Oluşturun')}
           </h2>
-          <p className="mt-2 text-sm text-gray-600 font-semibold mb-8">
+          <p className="text-base text-slate-600 font-medium mb-10 leading-relaxed">
             {isForgotPassword 
               ? 'Kayıtlı e-posta adresinize bir sıfırlama bağlantısı göndereceğiz.' 
-              : 'Güvenli ve bulut tabanlı veteriner yönetim sistemi.'}
+              : 'Güvenli ve bulut tabanlı veteriner yönetim sistemine giriş yapın.'}
           </p>
 
           <form className="space-y-6" onSubmit={handleAuth}>
             {!isLogin && !isForgotPassword && (
-              <div>
-                <label className="block text-sm font-black text-black mb-2">İsim Soyisim</label>
-                <div className="relative rounded-xl shadow-sm">
+              <div className="group">
+                <label className="block text-sm font-bold text-slate-900 mb-2 transition-colors group-focus-within:text-[#1B4332]">İsim Soyisim</label>
+                <div className="relative rounded-2xl shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-500" />
+                    <User className="h-5 w-5 text-slate-400 group-focus-within:text-[#1B4332] transition-colors" />
                   </div>
                   <input
                     type="text"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
+                    className="block w-full pl-12 pr-4 py-4 sm:text-sm border-2 border-slate-200 rounded-2xl bg-slate-50 focus:bg-white focus:ring-0 focus:border-[#1B4332] transition-all placeholder-slate-400 font-semibold text-slate-900 shadow-sm hover:border-slate-300"
                     placeholder="Dr. Ad Soyad"
                   />
                 </div>
               </div>
             )}
             
-            <div>
-              <label className="block text-sm font-black text-black mb-2">E-Posta Adresi</label>
-              <div className="relative rounded-xl shadow-sm">
+            <div className="group">
+              <label className="block text-sm font-bold text-slate-900 mb-2 transition-colors group-focus-within:text-[#1B4332]">E-Posta Adresi</label>
+              <div className="relative rounded-2xl shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-500" />
+                  <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-[#1B4332] transition-colors" />
                 </div>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
+                  className="block w-full pl-12 pr-4 py-4 sm:text-sm border-2 border-slate-200 rounded-2xl bg-slate-50 focus:bg-white focus:ring-0 focus:border-[#1B4332] transition-all placeholder-slate-400 font-semibold text-slate-900 shadow-sm hover:border-slate-300"
                   placeholder="ornek@klinik.com"
                 />
               </div>
             </div>
 
             {!isForgotPassword && (
-              <div>
+              <div className="group">
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-black text-black">Şifre</label>
+                  <label className="block text-sm font-bold text-slate-900 transition-colors group-focus-within:text-[#1B4332]">Şifre</label>
                   {isLogin && (
                     <button 
                       type="button"
                       onClick={() => setIsForgotPassword(true)}
-                      className="text-sm font-bold text-[#1B4332] hover:text-[#2a5a45] hover:underline"
+                      className="text-sm font-bold text-[#40916C] hover:text-[#1B4332] hover:underline transition-colors"
                     >
                       Şifremi unuttum
                     </button>
                   )}
                 </div>
-                <div className="relative rounded-xl shadow-sm">
+                <div className="relative rounded-2xl shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-500" />
+                    <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-[#1B4332] transition-colors" />
                   </div>
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-4 sm:text-sm border border-gray-300 rounded-xl bg-white focus:bg-white focus:ring-2 focus:ring-[#1B4332] focus:border-[#1B4332] transition-all placeholder-gray-500 font-semibold text-black shadow-sm"
+                    className="block w-full pl-12 pr-4 py-4 sm:text-sm border-2 border-slate-200 rounded-2xl bg-slate-50 focus:bg-white focus:ring-0 focus:border-[#1B4332] transition-all placeholder-slate-400 font-semibold text-slate-900 shadow-sm hover:border-slate-300"
                     placeholder="••••••••"
                   />
                 </div>
               </div>
             )}
 
-            <div className="pt-2">
+            <div className="pt-4">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-[0_4px_14px_0_rgba(27,67,50,0.39)] text-sm font-bold text-white bg-[#1B4332] hover:bg-[#122c21] hover:shadow-[0_6px_20px_rgba(27,67,50,0.23)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4332] transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+                className="w-full flex justify-center py-4 px-4 rounded-2xl shadow-[0_10px_20px_-10px_rgba(27,67,50,0.5)] text-sm font-bold text-white bg-gradient-to-r from-[#1B4332] to-[#2D6A4F] hover:from-[#122c21] hover:to-[#1B4332] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4332] transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_15px_30px_-10px_rgba(27,67,50,0.6)] disabled:opacity-70 disabled:hover:translate-y-0"
               >
                 {loading ? 'İşleniyor...' : (isForgotPassword ? 'Sıfırlama Bağlantısı Gönder' : (isLogin ? 'Güvenli Giriş Yap' : 'Klinik Hesabı Oluştur'))}
               </button>
@@ -223,24 +224,26 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
           </form>
 
           {/* Toggle Button for Login/Register */}
-          <div className="mt-8 pt-6 border-t border-gray-200/60 text-center">
+          <div className="mt-10 pt-8 border-t-2 border-slate-100 text-center">
             {isForgotPassword ? (
               <button 
                 onClick={() => setIsForgotPassword(false)} 
-                className="text-sm font-bold text-gray-700 hover:text-black transition-colors"
+                className="text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
               >
                 ← Giriş Ekranına Dön
               </button>
             ) : (
-              <p className="text-sm text-gray-800 font-bold">
-                {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                <span className="text-base text-slate-900 font-semibold">
+                  {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
+                </span>
                 <button 
                   onClick={() => setIsLogin(!isLogin)} 
-                  className="font-black text-[#1B4332] hover:text-[#2a5a45] ml-2 transition-colors underline decoration-2 underline-offset-4"
+                  className="text-base font-black text-[#1B4332] hover:text-[#40916C] transition-colors underline decoration-2 underline-offset-4"
                 >
-                  {isLogin ? 'Ücretsiz Kayıt Olun' : 'Buradan Giriş Yapın'}
+                  {isLogin ? 'Hemen Ücretsiz Kayıt Olun' : 'Buradan Giriş Yapın'}
                 </button>
-              </p>
+              </div>
             )}
           </div>
 

@@ -29,39 +29,44 @@ export function Appointments() {
   const [time, setTime] = useState('');
   const [price, setPrice] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!patientName || !date || !time) { toast.error('Lütfen zorunlu alanları doldurun.'); return; }
     const existing = patients.find(p => p.name.toLowerCase() === patientName.toLowerCase());
     const owner = existing ? existing.owner : 'Bilinmiyor';
-    addAppointment({ patient: patientName, owner, type, date, time, status: 'Bekliyor', color: 'bg-blue-100 text-blue-800' });
     
-    // İşlem ücreti girildiyse otomatik muhasebeye işle
-    if (price && Number(price) > 0) {
-      addTransaction({
-        date: date === 'Bugün' ? new Date().toLocaleDateString('tr-TR') : date,
-        description: `${type} Ücreti (${patientName})`,
-        type: 'income',
-        amount: `+₺${price}`,
-        method: 'Nakit',
-        eInvoice: false
-      });
-      toast.success('İşlem ücreti muhasebeye Gelir olarak kaydedildi.');
+    try {
+      await addAppointment({ patient: patientName, owner, type, date, time, status: 'Bekliyor', color: 'bg-blue-100 text-blue-800' });
+      
+      // İşlem ücreti girildiyse otomatik muhasebeye işle
+      if (price && Number(price) > 0) {
+        await addTransaction({
+          date: date === 'Bugün' ? new Date().toLocaleDateString('tr-TR') : date,
+          description: `${type} Ücreti (${patientName})`,
+          type: 'income',
+          amount: `+₺${price}`,
+          method: 'Nakit',
+          eInvoice: false
+        });
+        toast.success('İşlem ücreti muhasebeye Gelir olarak kaydedildi.');
+      }
+      
+      // Randevu eklendikten sonra WhatsApp onay mesajı göndermeyi teklif et
+      if (existing?.phone) {
+        const msg = `Merhaba ${owner} Hanım/Bey,\n${patientName} için ${date} tarihinde saat ${time}'de ${type} randevunuz oluşturulmuştur. ✅\nBilgi için kliniğimizi arayabilirsiniz. 🐾`;
+        setTimeout(() => {
+          if (window.confirm('Randevu onay mesajını WhatsApp ile göndermek ister misiniz?')) {
+            openWhatsApp(existing.phone, msg);
+          }
+        }, 300);
+      }
+      
+      toast.success('Randevu başarıyla eklendi!');
+      setIsModalOpen(false);
+      setPatientName(''); setType('Muayene'); setDate(''); setTime(''); setPrice('');
+    } catch (err: any) {
+      toast.error(err.message || 'Randevu eklenirken bir hata oluştu');
     }
-    
-    // Randevu eklendikten sonra WhatsApp onay mesajı göndermeyi teklif et
-    if (existing?.phone) {
-      const msg = `Merhaba ${owner} Hanım/Bey,\n${patientName} için ${date} tarihinde saat ${time}'de ${type} randevunuz oluşturulmuştur. ✅\nBilgi için kliniğimizi arayabilirsiniz. 🐾`;
-      setTimeout(() => {
-        if (window.confirm('Randevu onay mesajını WhatsApp ile göndermek ister misiniz?')) {
-          openWhatsApp(existing.phone, msg);
-        }
-      }, 300);
-    }
-    
-    toast.success('Randevu başarıyla eklendi!');
-    setIsModalOpen(false);
-    setPatientName(''); setType('Muayene'); setDate(''); setTime(''); setPrice('');
   };
 
   const statusConfig: Record<string, { color: string; icon: React.ReactNode }> = {

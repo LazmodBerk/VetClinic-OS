@@ -41,20 +41,25 @@ export function Patients() {
     setOwner(''); setOwnerGender('bay'); setPhone(''); setWeight('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !owner) { toast.error('Lütfen zorunlu alanları doldurun.'); return; }
-    addPatient({
-      name, species,
-      breed: breed || 'Belirtilmedi',
-      owner, ownerGender, phone,
-      weight: weight ? `${weight} kg` : '-',
-      lastVisit: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
-      status: 'Sağlıklı'
-    });
-    toast.success(`${name} başarıyla eklendi!`);
-    setIsModalOpen(false);
-    resetForm();
+    
+    try {
+      await addPatient({
+        name, species,
+        breed: breed || 'Belirtilmedi',
+        owner, ownerGender, phone,
+        weight: weight ? `${weight} kg` : '-',
+        lastVisit: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
+        status: 'Sağlıklı'
+      });
+      toast.success(`${name} başarıyla eklendi!`);
+      setIsModalOpen(false);
+      resetForm();
+    } catch (err: any) {
+      toast.error(err.message || 'Eklerken bir hata oluştu');
+    }
   };
 
   const filtered = patients.filter(p =>

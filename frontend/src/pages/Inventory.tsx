@@ -33,26 +33,30 @@ export function Inventory() {
     setIsEditModalOpen(true);
   };
 
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !stock || !price) {
       toast.error('Lütfen zorunlu alanları doldurun.');
       return;
     }
     
-    addInventoryItem({
-      name,
-      category,
-      stock: parseInt(stock, 10),
-      minStock: 10,
-      unit: 'Adet',
-      price: `₺${price}`,
-      status: parseInt(stock, 10) < 10 ? 'Kritik' : 'Yeterli'
-    });
-    
-    toast.success('Ürün stoka başarıyla eklendi!');
-    setIsModalOpen(false);
-    resetForm();
+    try {
+      await addInventoryItem({
+        name,
+        category,
+        stock: parseInt(stock, 10),
+        minStock: 10,
+        unit: 'Adet',
+        price: `₺${price}`,
+        status: parseInt(stock, 10) < 10 ? 'Kritik' : 'Yeterli'
+      });
+      
+      toast.success('Ürün stoka başarıyla eklendi!');
+      setIsModalOpen(false);
+      resetForm();
+    } catch (err: any) {
+      toast.error(err.message || 'Ürün eklenirken bir hata oluştu');
+    }
   };
 
   const handleEditSubmit = (e: React.FormEvent) => {

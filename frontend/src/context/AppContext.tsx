@@ -220,9 +220,11 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
   const getUserId = () => session?.user?.id;
 
   const addPatient = async (p: Omit<Patient, 'id'>) => {
-    const userId = getUserId(); if (!userId) return;
+    const userId = getUserId(); 
+    if (!userId) throw new Error('Oturum süresi dolmuş, lütfen tekrar giriş yapın.');
     const { data, error } = await supabase.from('patients').insert([{ ...p, user_id: userId }]).select().single();
-    if (data && !error) setPatients(prev => [data, ...prev]);
+    if (error) throw new Error(error.message);
+    if (data) setPatients(prev => [data, ...prev]);
   };
 
   const updatePatient = async (p: Patient) => {
@@ -236,15 +238,19 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
   };
 
   const addAppointment = async (a: Omit<Appointment, 'id'>) => {
-    const userId = getUserId(); if (!userId) return;
+    const userId = getUserId(); 
+    if (!userId) throw new Error('Oturum süresi dolmuş.');
     const { data, error } = await supabase.from('appointments').insert([{ ...a, user_id: userId }]).select().single();
-    if (data && !error) setAppointments(prev => [data, ...prev]);
+    if (error) throw new Error(error.message);
+    if (data) setAppointments(prev => [data, ...prev]);
   };
 
   const addVaccine = async (v: Omit<Vaccine, 'id'>) => {
-    const userId = getUserId(); if (!userId) return;
+    const userId = getUserId(); 
+    if (!userId) throw new Error('Oturum süresi dolmuş.');
     const { data, error } = await supabase.from('vaccines').insert([{ ...v, user_id: userId }]).select().single();
-    if (data && !error) setVaccines(prev => [data, ...prev]);
+    if (error) throw new Error(error.message);
+    if (data) setVaccines(prev => [data, ...prev]);
   };
 
   const updateVaccine = async (v: Vaccine) => {
@@ -258,9 +264,11 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
   };
 
   const addInventoryItem = async (i: Omit<InventoryItem, 'id'>) => {
-    const userId = getUserId(); if (!userId) return;
+    const userId = getUserId(); 
+    if (!userId) throw new Error('Oturum süresi dolmuş.');
     const { data, error } = await supabase.from('inventory').insert([{ ...i, user_id: userId }]).select().single();
-    if (data && !error) setInventoryItems(prev => [data, ...prev]);
+    if (error) throw new Error(error.message);
+    if (data) setInventoryItems(prev => [data, ...prev]);
   };
 
   const updateInventoryItem = async (i: InventoryItem) => {
@@ -274,9 +282,11 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
   };
 
   const addTransaction = async (t: Omit<Transaction, 'id'>) => {
-    const userId = getUserId(); if (!userId) return;
+    const userId = getUserId(); 
+    if (!userId) throw new Error('Oturum süresi dolmuş.');
     const { data, error } = await supabase.from('transactions').insert([{ ...t, user_id: userId }]).select().single();
-    if (data && !error) setTransactions(prev => [data, ...prev]);
+    if (error) throw new Error(error.message);
+    if (data) setTransactions(prev => [data, ...prev]);
   };
 
   const addFarmAnimal = async (f: Omit<FarmAnimal, 'id'>) => {

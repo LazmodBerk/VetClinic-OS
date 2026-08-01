@@ -14,25 +14,29 @@ export function Farm() {
   const [status, setStatus] = useState('Sağlıklı');
   const [search, setSearch] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tagNo) {
       toast.error('Küpe no zorunludur.');
       return;
     }
     
-    addFarmAnimal({
-      tagNo,
-      type,
-      breed: breed || 'Bilinmiyor',
-      status,
-      nextCheckup: 'Belirlenmedi',
-      inseminationDate: '-'
-    });
-    
-    toast.success('Büyükbaş hayvan başarıyla eklendi!');
-    setIsModalOpen(false);
-    setTagNo(''); setType('İnek'); setBreed(''); setStatus('Sağlıklı');
+    try {
+      await addFarmAnimal({
+        tagNo,
+        type,
+        breed: breed || 'Bilinmiyor',
+        status,
+        nextCheckup: 'Belirlenmedi',
+        inseminationDate: '-'
+      });
+      
+      toast.success('Büyükbaş hayvan başarıyla eklendi!');
+      setIsModalOpen(false);
+      setTagNo(''); setType('İnek'); setBreed(''); setStatus('Sağlıklı');
+    } catch (err: any) {
+      toast.error(err.message || 'Eklerken bir hata oluştu');
+    }
   };
 
   return (

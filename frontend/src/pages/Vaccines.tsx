@@ -14,7 +14,7 @@ export function Vaccines() {
   const [time, setTime] = useState('');
   const [filterOverdue, setFilterOverdue] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!patientName || !date) {
       toast.error('Lütfen zorunlu alanları doldurun.');
@@ -24,18 +24,22 @@ export function Vaccines() {
     const existingPatient = patients.find(p => p.name.toLowerCase() === patientName.toLowerCase());
     const owner = existingPatient ? existingPatient.owner : 'Bilinmiyor';
     
-    addVaccine({
-      patient: patientName,
-      owner,
-      vaccine: vaccineType,
-      date,
-      time,
-      status: 'Planlandı'
-    });
-    
-    toast.success('Aşı planlaması başarıyla eklendi!');
-    setIsModalOpen(false);
-    setPatientName(''); setVaccineType('Karma'); setDate(''); setTime('');
+    try {
+      await addVaccine({
+        patient: patientName,
+        owner,
+        vaccine: vaccineType,
+        date,
+        time,
+        status: 'Planlandı'
+      });
+      
+      toast.success('Aşı planlaması başarıyla eklendi!');
+      setIsModalOpen(false);
+      setPatientName(''); setVaccineType('Karma'); setDate(''); setTime('');
+    } catch (err: any) {
+      toast.error(err.message || 'Aşı eklenirken bir hata oluştu');
+    }
   };
 
   return (
