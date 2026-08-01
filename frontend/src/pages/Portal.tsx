@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar as CalendarIcon, Clock, PawPrint, Smartphone, LogOut, CheckCircle2, Download, Syringe, Plus, Video, PhoneOff, Mic, Camera, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppContext } from '../context/AppContext';
@@ -6,6 +7,7 @@ import { Modal } from '../components/Modal';
 
 export function Portal() {
   const { patients, appointments, vaccines, addAppointment } = useAppContext();
+  const navigate = useNavigate();
   
   const [loggedInOwner, setLoggedInOwner] = useState<string | null>(null);
 
@@ -121,7 +123,7 @@ export function Portal() {
             <span className="text-2xl font-serif font-bold text-[#1B4332]">CanVet.</span>
             <span className="ml-4 pl-4 border-l border-gray-300 text-sm font-medium text-gray-500 hidden sm:block">Hasta Portalı</span>
           </div>
-          <button onClick={() => { setLoggedInOwner(null); toast.success('Başarıyla çıkış yapıldı.'); }} className="flex items-center text-sm font-bold text-[#1B4332] hover:text-[#2a5a45] transition-colors border-b-2 border-transparent hover:border-[#95D5B2] pb-1">
+          <button onClick={() => { setLoggedInOwner(null); toast.success('Başarıyla çıkış yapıldı.'); navigate('/'); }} className="flex items-center text-sm font-bold text-[#1B4332] hover:text-[#2a5a45] transition-colors border-b-2 border-transparent hover:border-[#95D5B2] pb-1">
             <LogOut className="h-4 w-4 mr-1.5" />
             Çıkış Yap
           </button>
