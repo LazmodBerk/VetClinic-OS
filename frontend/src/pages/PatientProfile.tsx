@@ -365,7 +365,7 @@ export function PatientProfile() {
                 <input 
                   type="text" 
                   value={editFormData.medicalInfo?.microchipNo || ''}
-                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, microchipNo: e.target.value }})}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '', ...(editFormData.medicalInfo || {}), microchipNo: e.target.value }})}
                   className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
                 />
               </div>
@@ -375,7 +375,7 @@ export function PatientProfile() {
                   type="text" 
                   placeholder="Örn: 12.04.2023"
                   value={editFormData.medicalInfo?.birthDate || ''}
-                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, birthDate: e.target.value }})}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '', ...(editFormData.medicalInfo || {}), birthDate: e.target.value }})}
                   className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
                 />
               </div>
@@ -385,7 +385,7 @@ export function PatientProfile() {
                   type="text" 
                   placeholder="Örn: Erkek (Kısırlaştırılmış)"
                   value={editFormData.medicalInfo?.gender || ''}
-                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, gender: e.target.value }})}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '', ...(editFormData.medicalInfo || {}), gender: e.target.value }})}
                   className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
                 />
               </div>
@@ -394,7 +394,7 @@ export function PatientProfile() {
                 <input 
                   type="text" 
                   value={editFormData.medicalInfo?.bloodType || ''}
-                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, bloodType: e.target.value }})}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '', ...(editFormData.medicalInfo || {}), bloodType: e.target.value }})}
                   className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
                 />
               </div>
@@ -404,7 +404,7 @@ export function PatientProfile() {
                   type="text" 
                   placeholder="Örn: Penisilin, Piliç Eti"
                   value={editFormData.medicalInfo?.allergies || ''}
-                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { ...editFormData.medicalInfo, allergies: e.target.value }})}
+                  onChange={(e) => setEditFormData({...editFormData, medicalInfo: { microchipNo: '', birthDate: '', gender: '', bloodType: '', allergies: '', ...(editFormData.medicalInfo || {}), allergies: e.target.value }})}
                   className="w-full border rounded-lg border-gray-300 px-3 py-2 text-sm focus:ring-[#1B4332] focus:border-[#1B4332]"
                 />
               </div>
