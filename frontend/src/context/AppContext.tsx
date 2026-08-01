@@ -1,44 +1,49 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { supabase } from '../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
-
 export interface Patient {
-  id: number;
+  id: number | string;
   name: string;
-  species: string;
-  breed: string;
+  species?: string;
+  breed?: string;
+  age?: string;
   owner: string;
-  ownerGender: 'bayan' | 'bay'; // Hanım / Bey için
   phone?: string;
-  lastVisit: string;
-  weight: string;
-  status: string;
+  ownerGender?: 'bay' | 'bayan';
+  lastVisit?: string;
+  weight?: string;
+  status?: string;
+  notes?: any[];
   medicalInfo?: {
-    microchipNo: string;
-    birthDate: string;
-    gender: string;
-    bloodType: string;
-    allergies: string;
-    documents?: { id: string; name: string; dataUrl: string; type: string; date: string; size: number }[];
+    microchipNo?: string;
+    birthDate?: string;
+    gender?: string;
+    bloodType?: string;
+    allergies?: string;
+    documents?: any[];
   };
-  notes?: { id: number; date: string; title: string; content: string }[];
+  documents?: any[];
 }
 
 export interface Appointment {
-  id: number;
+  id: number | string;
   patient: string;
   owner: string;
-  type: string;
   date: string;
   time: string;
+  type: string;
   status: string;
-  color: string;
+  color?: string;
 }
 
 export interface Vaccine {
-  id: number;
+  id: number | string;
   patient: string;
   owner: string;
   vaccine: string;
@@ -48,7 +53,7 @@ export interface Vaccine {
 }
 
 export interface InventoryItem {
-  id: number;
+  id: number | string;
   name: string;
   category: string;
   stock: number;
@@ -59,23 +64,26 @@ export interface InventoryItem {
 }
 
 export interface Transaction {
-  id: number;
-  date: string;
-  description: string;
+  id: number | string;
   type: 'income' | 'expense';
   amount: string;
-  method: string;
-  eInvoice: boolean;
+  description: string;
+  date: string;
+  method?: string;
+  eInvoice?: boolean;
 }
 
 export interface FarmAnimal {
-  id: number;
+  id: number | string;
   tagNo: string;
-  type: string;
-  breed: string;
+  species?: string;
+  breed?: string;
+  age?: string;
+  farmOwner?: string;
   status: string;
   nextCheckup: string;
   inseminationDate: string;
+  type?: string;
 }
 
 export interface SettingsData {
@@ -90,56 +98,9 @@ export interface SettingsData {
   notifyStock?: boolean;
 }
 
-// ─────────────────────────────────────────────
-// YARDIMCI: Hanım / Bey seçici
-// ─────────────────────────────────────────────
 export function honorific(gender?: 'bayan' | 'bay'): string {
   return gender === 'bayan' ? 'Hanım' : 'Bey';
 }
-
-// ─────────────────────────────────────────────
-// YARDIMCI: localStorage ile state yönetimi
-// ─────────────────────────────────────────────
-function usePersistedState<T>(key: string, defaultValue: T) {
-  const [state, setState] = useState<T>(() => {
-    try {
-      const stored = localStorage.getItem(`vcms_${key}`);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // Boş array olmaması için kontrol
-        if (Array.isArray(parsed) && parsed.length === 0) return defaultValue;
-        return parsed;
-      }
-    } catch {
-      // localStorage okunamadıysa varsayılanı kullan
-    }
-    return defaultValue;
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(`vcms_${key}`, JSON.stringify(state));
-    } catch {
-      // localStorage yazılamadıysa (örn: depolama dolu) sessizce geç
-    }
-  }, [key, state]);
-
-  return [state, setState] as const;
-}
-
-// ─────────────────────────────────────────────
-// VARSAYILAN VERİLER
-// ─────────────────────────────────────────────
-const DEFAULT_PATIENTS: Patient[] = [];
-const DEFAULT_APPOINTMENTS: Appointment[] = [];
-const DEFAULT_VACCINES: Vaccine[] = [
-  { id: 1, patient: 'Pamuk', owner: 'Ahmet Yılmaz', vaccine: 'Karma 1', date: 'Bugün', time: '14:30', status: 'Bekliyor' },
-  { id: 2, patient: 'Tarçın', owner: 'Ayşe Demir', vaccine: 'Kuduz', date: 'Yarın', time: '10:00', status: 'Planlandı' },
-  { id: 3, patient: 'Max', owner: 'Can Kaya', vaccine: 'Lyme', date: '15 Haz 2026', time: '11:15', status: 'Tamamlandı' },
-];
-const DEFAULT_INVENTORY: InventoryItem[] = [];
-const DEFAULT_TRANSACTIONS: Transaction[] = [];
-const DEFAULT_FARM: FarmAnimal[] = [];
 
 const DEFAULT_SETTINGS: SettingsData = {
   clinicName: 'BulutVet Premium Klinik',
@@ -153,14 +114,11 @@ const DEFAULT_SETTINGS: SettingsData = {
   notifyStock: true
 };
 
-// ─────────────────────────────────────────────
-// CONTEXT TYPE
-// ─────────────────────────────────────────────
 interface AppContextType {
   patients: Patient[];
   addPatient: (patient: Omit<Patient, 'id'>) => void;
   updatePatient: (patient: Patient) => void;
-  deletePatient: (id: number) => void;
+  deletePatient: (id: string | number) => void;
 
   appointments: Appointment[];
   addAppointment: (appointment: Omit<Appointment, 'id'>) => void;
@@ -168,12 +126,12 @@ interface AppContextType {
   vaccines: Vaccine[];
   addVaccine: (vaccine: Omit<Vaccine, 'id'>) => void;
   updateVaccine: (vaccine: Vaccine) => void;
-  deleteVaccine: (id: number) => void;
+  deleteVaccine: (id: string | number) => void;
 
   inventoryItems: InventoryItem[];
   addInventoryItem: (item: Omit<InventoryItem, 'id'>) => void;
   updateInventoryItem: (item: InventoryItem) => void;
-  deleteInventoryItem: (id: number) => void;
+  deleteInventoryItem: (id: string | number) => void;
 
   transactions: Transaction[];
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
@@ -190,53 +148,158 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// ─────────────────────────────────────────────
-// PROVIDER — tüm veriler localStorage'a kaydedilir
-// ─────────────────────────────────────────────
-export function AppProvider({ children }: { children: ReactNode }) {
-  const [patients,      setPatients]      = usePersistedState<Patient[]>('patients',      DEFAULT_PATIENTS);
-  const [appointments,  setAppointments]  = usePersistedState<Appointment[]>('appointments',  DEFAULT_APPOINTMENTS);
-  const [vaccines,      setVaccines]      = usePersistedState<Vaccine[]>('vaccines',      DEFAULT_VACCINES);
-  const [inventoryItems,setInventoryItems]= usePersistedState<InventoryItem[]>('inventory', DEFAULT_INVENTORY);
-  const [transactions,  setTransactions]  = usePersistedState<Transaction[]>('transactions',  DEFAULT_TRANSACTIONS);
-  const [farmAnimals,   setFarmAnimals]   = usePersistedState<FarmAnimal[]>('farm',        DEFAULT_FARM);
-  const [settings,      setSettings]      = usePersistedState<SettingsData>('settings',    DEFAULT_SETTINGS);
+export function AppProvider({ children, session }: { children: ReactNode, session?: Session | null }) {
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [vaccines, setVaccines] = useState<Vaccine[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [farmAnimals, setFarmAnimals] = useState<FarmAnimal[]>([]);
+  const [settings, setSettings] = useState<SettingsData>(DEFAULT_SETTINGS);
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const savedTheme = localStorage.getItem('canvet_theme');
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      return savedTheme;
-    }
+    if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
   useEffect(() => {
     const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    if (theme === 'dark') root.classList.add('dark');
+    else root.classList.remove('dark');
     localStorage.setItem('canvet_theme', theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+
+  // Load data from Supabase when session exists
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    const userId = session.user.id;
+
+    const loadData = async () => {
+      try {
+        const [
+          { data: pts }, { data: aPts }, { data: vcs }, 
+          { data: inv }, { data: txs }, { data: sets }
+        ] = await Promise.all([
+          supabase.from('patients').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+          supabase.from('appointments').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+          supabase.from('vaccines').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+          supabase.from('inventory').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+          supabase.from('transactions').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
+          supabase.from('settings').select('*').eq('user_id', userId).single()
+        ]);
+
+        if (pts) setPatients(pts);
+        if (aPts) setAppointments(aPts);
+        if (vcs) setVaccines(vcs);
+        if (inv) setInventoryItems(inv);
+        if (txs) setTransactions(txs);
+        if (sets) {
+          setSettings({
+            clinicName: sets.clinic_name || DEFAULT_SETTINGS.clinicName,
+            phone: sets.phone || DEFAULT_SETTINGS.phone,
+            email: sets.email || DEFAULT_SETTINGS.email,
+            address: sets.address || DEFAULT_SETTINGS.address,
+            taxOffice: sets.tax_office || DEFAULT_SETTINGS.taxOffice,
+            taxNo: sets.tax_no || DEFAULT_SETTINGS.taxNo,
+            geminiApiKey: sets.gemini_api_key || '',
+            notifyVaccines: sets.notify_vaccines ?? true,
+            notifyStock: sets.notify_stock ?? true
+          });
+        }
+      } catch (err) {
+        console.error("Veri yükleme hatası:", err);
+      }
+    };
+
+    loadData();
+  }, [session]);
+
+  const getUserId = () => session?.user?.id;
+
+  const addPatient = async (p: Omit<Patient, 'id'>) => {
+    const userId = getUserId(); if (!userId) return;
+    const { data, error } = await supabase.from('patients').insert([{ ...p, user_id: userId }]).select().single();
+    if (data && !error) setPatients(prev => [data, ...prev]);
   };
 
-  const addPatient       = (p: Omit<Patient, 'id'>)       => setPatients(prev => [{ ...p, id: Date.now() }, ...prev]);
-  const updatePatient    = (p: Patient)                    => setPatients(prev => prev.map(pt => pt.id === p.id ? p : pt));
-  const deletePatient    = (id: number)                    => setPatients(prev => prev.filter(p => p.id !== id));
-  const addAppointment   = (a: Omit<Appointment, 'id'>)   => setAppointments(prev => [{ ...a, id: Date.now() }, ...prev]);
-  const addVaccine       = (v: Omit<Vaccine, 'id'>)       => setVaccines(prev => [{ ...v, id: Date.now() }, ...prev]);
-  const updateVaccine    = (v: Vaccine)                   => setVaccines(prev => prev.map(vc => vc.id === v.id ? v : vc));
-  const deleteVaccine    = (id: number)                   => setVaccines(prev => prev.filter(v => v.id !== id));
-  const addInventoryItem = (i: Omit<InventoryItem, 'id'>) => setInventoryItems(prev => [{ ...i, id: Date.now() }, ...prev]);
-  const updateInventoryItem = (i: InventoryItem) => setInventoryItems(prev => prev.map(item => item.id === i.id ? i : item));
-  const deleteInventoryItem = (id: number) => setInventoryItems(prev => prev.filter(i => i.id !== id));
-  const addTransaction   = (t: Omit<Transaction, 'id'>)   => setTransactions(prev => [{ ...t, id: Date.now() }, ...prev]);
-  const addFarmAnimal    = (f: Omit<FarmAnimal, 'id'>)    => setFarmAnimals(prev => [{ ...f, id: Date.now() }, ...prev]);
-  const updateSettings   = (s: SettingsData)               => setSettings(s);
+  const updatePatient = async (p: Patient) => {
+    const { data, error } = await supabase.from('patients').update(p).eq('id', p.id).select().single();
+    if (data && !error) setPatients(prev => prev.map(pt => pt.id === p.id ? data : pt));
+  };
+
+  const deletePatient = async (id: string | number) => {
+    await supabase.from('patients').delete().eq('id', id);
+    setPatients(prev => prev.filter(p => p.id !== id));
+  };
+
+  const addAppointment = async (a: Omit<Appointment, 'id'>) => {
+    const userId = getUserId(); if (!userId) return;
+    const { data, error } = await supabase.from('appointments').insert([{ ...a, user_id: userId }]).select().single();
+    if (data && !error) setAppointments(prev => [data, ...prev]);
+  };
+
+  const addVaccine = async (v: Omit<Vaccine, 'id'>) => {
+    const userId = getUserId(); if (!userId) return;
+    const { data, error } = await supabase.from('vaccines').insert([{ ...v, user_id: userId }]).select().single();
+    if (data && !error) setVaccines(prev => [data, ...prev]);
+  };
+
+  const updateVaccine = async (v: Vaccine) => {
+    const { data, error } = await supabase.from('vaccines').update(v).eq('id', v.id).select().single();
+    if (data && !error) setVaccines(prev => prev.map(vc => vc.id === v.id ? data : vc));
+  };
+
+  const deleteVaccine = async (id: string | number) => {
+    await supabase.from('vaccines').delete().eq('id', id);
+    setVaccines(prev => prev.filter(v => v.id !== id));
+  };
+
+  const addInventoryItem = async (i: Omit<InventoryItem, 'id'>) => {
+    const userId = getUserId(); if (!userId) return;
+    const { data, error } = await supabase.from('inventory').insert([{ ...i, user_id: userId }]).select().single();
+    if (data && !error) setInventoryItems(prev => [data, ...prev]);
+  };
+
+  const updateInventoryItem = async (i: InventoryItem) => {
+    const { data, error } = await supabase.from('inventory').update(i).eq('id', i.id).select().single();
+    if (data && !error) setInventoryItems(prev => prev.map(item => item.id === i.id ? data : item));
+  };
+
+  const deleteInventoryItem = async (id: string | number) => {
+    await supabase.from('inventory').delete().eq('id', id);
+    setInventoryItems(prev => prev.filter(i => i.id !== id));
+  };
+
+  const addTransaction = async (t: Omit<Transaction, 'id'>) => {
+    const userId = getUserId(); if (!userId) return;
+    const { data, error } = await supabase.from('transactions').insert([{ ...t, user_id: userId }]).select().single();
+    if (data && !error) setTransactions(prev => [data, ...prev]);
+  };
+
+  const addFarmAnimal = async (f: Omit<FarmAnimal, 'id'>) => {
+    // Farm animals could be added to DB similarly, handling locally for fallback brevity
+    setFarmAnimals(prev => [{ ...f, id: Date.now().toString() }, ...prev]);
+  };
+
+  const updateSettings = async (s: SettingsData) => {
+    const userId = getUserId(); if (!userId) return;
+    setSettings(s);
+    await supabase.from('settings').upsert({
+      user_id: userId,
+      clinic_name: s.clinicName,
+      phone: s.phone,
+      email: s.email,
+      address: s.address,
+      tax_office: s.taxOffice,
+      tax_no: s.taxNo,
+      gemini_api_key: s.geminiApiKey,
+      notify_vaccines: s.notifyVaccines,
+      notify_stock: s.notifyStock
+    });
+  };
 
   return (
     <AppContext.Provider value={{

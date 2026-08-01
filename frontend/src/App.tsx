@@ -20,6 +20,9 @@ import { AppProvider, useAppContext } from './context/AppContext';
 import { Logo } from './components/Logo';
 import { PatientProfile } from './pages/PatientProfile';
 import { LandingPage } from './pages/LandingPage';
+import { Auth } from './pages/Auth';
+import { supabase } from './lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -294,26 +297,59 @@ function MainLayout({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div className="h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1B4332]"></div></div>;
+  }
+
+  // The website and portal routes are public
   return (
-    <AppProvider>
+    <AppProvider session={session}>
       <Routes>
-        <Route path="/" element={<MainLayout><Dashboard /></MainLayout>} />
-        <Route path="/appointments" element={<MainLayout><Appointments /></MainLayout>} />
-        <Route path="/patients" element={<MainLayout><Patients /></MainLayout>} />
-        <Route path="/patients/:id" element={<MainLayout><PatientProfile /></MainLayout>} />
-        <Route path="/vaccines" element={<MainLayout><Vaccines /></MainLayout>} />
-        <Route path="/communication" element={<MainLayout><Communication /></MainLayout>} />
-        <Route path="/inventory" element={<MainLayout><Inventory /></MainLayout>} />
-        <Route path="/accounting" element={<MainLayout><Accounting /></MainLayout>} />
-        <Route path="/farm" element={<MainLayout><Farm /></MainLayout>} />
-        <Route path="/reports" element={<MainLayout><Reports /></MainLayout>} />
-        <Route path="/ai-assistant" element={<MainLayout><AiAssistant /></MainLayout>} />
-        <Route path="/ai-insights" element={<MainLayout><AiInsights /></MainLayout>} />
-        <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
-        
-        {/* Standalone Portal Route without MainLayout */}
-        <Route path="/portal" element={<Portal />} />
-        <Route path="/website" element={<LandingPage />} />
+        {!session ? (
+          <>
+            <Route path="/portal" element={<Portal />} />
+            <Route path="/website" element={<LandingPage />} />
+            <Route path="*" element={<Auth onAuthSuccess={() => {}} />} />
+          </>
+        ) : (
+          <>
+            <Route path="/" element={<MainLayout><Dashboard /></MainLayout>} />
+            <Route path="/appointments" element={<MainLayout><Appointments /></MainLayout>} />
+            <Route path="/patients" element={<MainLayout><Patients /></MainLayout>} />
+            <Route path="/patients/:id" element={<MainLayout><PatientProfile /></MainLayout>} />
+            <Route path="/vaccines" element={<MainLayout><Vaccines /></MainLayout>} />
+            <Route path="/communication" element={<MainLayout><Communication /></MainLayout>} />
+            <Route path="/inventory" element={<MainLayout><Inventory /></MainLayout>} />
+            <Route path="/accounting" element={<MainLayout><Accounting /></MainLayout>} />
+            <Route path="/farm" element={<MainLayout><Farm /></MainLayout>} />
+            <Route path="/reports" element={<MainLayout><Reports /></MainLayout>} />
+            <Route path="/ai-assistant" element={<MainLayout><AiAssistant /></MainLayout>} />
+            <Route path="/ai-insights" element={<MainLayout><AiInsights /></MainLayout>} />
+            <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
+            
+            <Route path="/portal" element={<Portal />} />
+            <Route path="/website" element={<LandingPage />} />
+            <Route path="*" element={<MainLayout><Dashboard /></MainLayout>} />
+          </>
+        )}
       </Routes>
     </AppProvider>
   );
