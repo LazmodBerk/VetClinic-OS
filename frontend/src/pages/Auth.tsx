@@ -5,19 +5,19 @@ import { Stethoscope, Lock, Mail, ChevronLeft, ChevronRight, Quote } from 'lucid
 
 const testimonials = [
   {
-    text: "BulutVet sayesinde kliniðimizdeki karmaþaya son verdik. Hasta takibi ve aþý hatýrlatmalarý inanýlmaz kolaylaþtý. Her hekimin kullanmasý gereken bir yazýlým.",
-    author: "Dr. Ayþe Yýlmaz",
-    clinic: "Mutlu Patiler Veteriner Kliniði"
+    text: "CanVet sayesinde kliniï¿½imizdeki karmaï¿½aya son verdik. Hasta takibi ve aï¿½ï¿½ hatï¿½rlatmalarï¿½ inanï¿½lmaz kolaylaï¿½tï¿½. Her hekimin kullanmasï¿½ gereken bir yazï¿½lï¿½m.",
+    author: "Dr. Ayï¿½e Yï¿½lmaz",
+    clinic: "Mutlu Patiler Veteriner Kliniï¿½i"
   },
   {
-    text: "Hem arayüzü çok modern hem de her yerden ulaþabiliyor olmamýz harika. Müþterilerimize otomatik giden hatýrlatma SMS'leri sayesinde aþý fire oranýmýz %80 düþtü.",
+    text: "Hem arayï¿½zï¿½ ï¿½ok modern hem de her yerden ulaï¿½abiliyor olmamï¿½z harika. Mï¿½ï¿½terilerimize otomatik giden hatï¿½rlatma SMS'leri sayesinde aï¿½ï¿½ fire oranï¿½mï¿½z %80 dï¿½ï¿½tï¿½.",
     author: "Dr. Mehmet Kaya",
     clinic: "CanDostum Hayvan Hastanesi"
   },
   {
-    text: "Tele-saðlýk modülü ile hastalarýmýza uzaktan destek verebilmek iþ yükümüzü inanýlmaz azalttý. BulutVet'e geçtikten sonra verimliliðimiz iki kat arttý.",
+    text: "Tele-saï¿½lï¿½k modï¿½lï¿½ ile hastalarï¿½mï¿½za uzaktan destek verebilmek iï¿½ yï¿½kï¿½mï¿½zï¿½ inanï¿½lmaz azalttï¿½. CanVet'e geï¿½tikten sonra verimliliï¿½imiz iki kat arttï¿½.",
     author: "Dr. Selin Demir",
-    clinic: "Sevgi Veteriner Kliniði"
+    clinic: "Sevgi Veteriner Kliniï¿½i"
   }
 ];
 
@@ -25,6 +25,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
@@ -45,16 +46,22 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success('Giriþ baþarýlý! Kliniðinize yönlendiriliyorsunuz...');
+        toast.success('Giriï¿½ baï¿½arï¿½lï¿½! Kliniï¿½inize yï¿½nlendiriliyorsunuz...');
         onAuthSuccess();
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            data: { full_name: fullName }
+          }
+        });
         if (error) throw error;
-        toast.success('Kayýt baþarýlý! Lütfen giriþ yapýn (E-posta doðrulama gerekebilir).');
+        toast.success('Kayï¿½t baï¿½arï¿½lï¿½! Lï¿½tfen giriï¿½ yapï¿½n (E-posta doï¿½rulama gerekebilir).');
         setIsLogin(true);
       }
     } catch (error: any) {
-      toast.error(error.message || 'Bir hata oluþtu.');
+      toast.error(error.message || 'Bir hata oluï¿½tu.');
     } finally {
       setLoading(false);
     }
@@ -64,7 +71,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     <div className="min-h-screen bg-gray-50 flex">
       <Toaster position="top-center" richColors />
       
-      {/* Sol Taraf: Giriþ Formu */}
+      {/* Sol Taraf: Giriï¿½ Formu */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 bg-white z-10 shadow-2xl">
         <div className="mx-auto w-full max-w-sm lg:max-w-md">
           <div className="flex items-center gap-3 mb-8">
@@ -72,22 +79,41 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
               <Stethoscope className="h-6 w-6 text-white" />
             </div>
             <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              BulutVet<span className="text-[#1B4332]">.</span>
+              CanVet<span className="text-[#1B4332]">.</span>
             </h2>
           </div>
           
           <h2 className="mt-2 text-2xl font-bold text-gray-900">
-            {isLogin ? 'Kliniðinize giriþ yapýn' : 'Yeni klinik hesabý oluþturun'}
+            {isLogin ? 'Kliniï¿½inize giriï¿½ yapï¿½n' : 'Yeni klinik hesabï¿½ oluï¿½turun'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            {isLogin ? 'Hesabýnýz yok mu?' : 'Zaten hesabýnýz var mý?'}
+            {isLogin ? 'Hesabï¿½nï¿½z yok mu?' : 'Zaten hesabï¿½nï¿½z var mï¿½?'}
             <button onClick={() => setIsLogin(!isLogin)} className="font-medium text-[#1B4332] hover:text-[#2a5a45] ml-1 transition-colors">
-              {isLogin ? 'Ücretsiz Kayýt Olun' : 'Buradan Giriþ Yapýn'}
+              {isLogin ? 'ï¿½cretsiz Kayï¿½t Olun' : 'Buradan Giriï¿½ Yapï¿½n'}
             </button>
           </p>
 
           <div className="mt-8">
             <form className="space-y-6" onSubmit={handleAuth}>
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700">Ä°sim Soyisim</label>
+                  <div className="mt-2 relative rounded-xl shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="focus:ring-[#1B4332] focus:border-[#1B4332] block w-full pl-11 sm:text-sm border-gray-300 rounded-xl py-3.5 border bg-gray-50 focus:bg-white transition-colors"
+                      placeholder="Dr. Ad Soyad"
+                    />
+                  </div>
+                </div>
+              )}
+              
               <div>
                 <label className="block text-sm font-semibold text-gray-700">E-Posta Adresi</label>
                 <div className="mt-2 relative rounded-xl shadow-sm">
@@ -106,7 +132,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700">Þifre</label>
+                <label className="block text-sm font-semibold text-gray-700">ï¿½ifre</label>
                 <div className="mt-2 relative rounded-xl shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -117,7 +143,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="focus:ring-[#1B4332] focus:border-[#1B4332] block w-full pl-11 sm:text-sm border-gray-300 rounded-xl py-3.5 border bg-gray-50 focus:bg-white transition-colors"
-                    placeholder="••••••••"
+                    placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
                   />
                 </div>
               </div>
@@ -128,7 +154,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                   disabled={loading}
                   className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-[#1B4332] hover:bg-[#122c21] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1B4332] transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
                 >
-                  {loading ? 'Ýþleniyor...' : (isLogin ? 'Giriþ Yap' : 'Klinik Hesabý Oluþtur')}
+                  {loading ? 'ï¿½ï¿½leniyor...' : (isLogin ? 'Giriï¿½ Yap' : 'Klinik Hesabï¿½ Oluï¿½tur')}
                 </button>
               </div>
             </form>
@@ -136,7 +162,7 @@ export function Auth({ onAuthSuccess }: { onAuthSuccess: () => void }) {
         </div>
       </div>
 
-      {/* Sað Taraf: Resim ve Yorumlar */}
+      {/* Saï¿½ Taraf: Resim ve Yorumlar */}
       <div className="hidden lg:block relative flex-1">
         <div className="absolute inset-0 bg-[url('/happy_pets_garden.jpg')] bg-cover bg-center"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>

@@ -15,7 +15,7 @@ export function AiAssistant() {
     {
       id: 1,
       role: 'ai',
-      text: 'Merhaba! Ben BulutVet AI Asistan. Size klinik yönetimi, stok takibi, hasta analizleri veya herhangi bir konuda nasıl yardımcı olabilirim?\n\nÖrnek sorular:\n- Bugünün kritik görevleri neler?\n- Son 1 ayın gelir analizi nasıl?\n- En çok tüketilen ilaçlar hangileri?'
+      text: 'Merhaba! Ben CanVet AI Asistan. Size klinik yönetimi, stok takibi, hasta analizleri veya herhangi bir konuda nasıl yardımcı olabilirim?\n\nÖrnek sorular:\n- Bugünün kritik görevleri neler?\n- Son 1 ayın gelir analizi nasıl?\n- En çok tüketilen ilaçlar hangileri?'
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
@@ -47,7 +47,7 @@ export function AiAssistant() {
       // Use Gemini API
       try {
         const promptContext = `
-        Sen BulutVet Veteriner Kliniği (Dr. Buğra Can Sefer) asistanısın. 
+        Sen CanVet Veteriner Kliniği (Dr. Buğra Can Sefer) asistanısın. 
         Klinikteki sistem verileri:
         - Hastalar: ${patients.length} adet
         - Bugünki Randevular: ${appointments.filter(a => a.date === 'Bugün').length} adet
@@ -147,7 +147,7 @@ export function AiAssistant() {
             <Sparkles className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight">BulutVet AI Asistan</h2>
+            <h2 className="text-xl font-bold text-white tracking-tight">CanVet AI Asistan</h2>
             <p className="text-blue-100 text-xs sm:text-sm">Yapay Zeka Destekli Klinik Danışmanınız</p>
           </div>
         </div>
@@ -226,7 +226,7 @@ export function AiAssistant() {
           </button>
         </form>
         <p className="text-center text-[11px] text-gray-400 mt-2">
-          BulutVet AI Asistan size fikir verebilir ancak tıbbi veya bağlayıcı finansal tavsiye niteliği taşımaz.
+          CanVet AI Asistan size fikir verebilir ancak tıbbi veya bağlayıcı finansal tavsiye niteliği taşımaz.
         </p>
       </div>
     </div>

@@ -247,7 +247,7 @@ export function Settings() {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900">Çok Yakında</h3>
                 <p className="mt-2 text-sm text-gray-500">
-                  Güvenlik, lisans ve yedekleme özellikleri BulutVet'in bir sonraki sürümünde aktif edilecektir.
+                  Güvenlik, lisans ve yedekleme özellikleri CanVet'in bir sonraki sürümünde aktif edilecektir.
                 </p>
               </div>
             )}

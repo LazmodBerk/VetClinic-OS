@@ -74,7 +74,7 @@ export function Portal() {
             <div className="h-10 w-10 bg-[#1B4332] rounded-none flex items-center justify-center">
               <span className="text-white font-serif font-bold text-xl">B</span>
             </div>
-            <span className="text-2xl font-serif font-bold text-[#1B4332]">BulutVet.</span>
+            <span className="text-2xl font-serif font-bold text-[#1B4332]">CanVet.</span>
             <span className="ml-4 pl-4 border-l border-gray-300 text-sm font-medium text-gray-500 hidden sm:block">Hasta Portalı</span>
           </div>
           <button onClick={() => toast.success('Başarıyla çıkış yapıldı.')} className="flex items-center text-sm font-bold text-[#1B4332] hover:text-[#2a5a45] transition-colors border-b-2 border-transparent hover:border-[#95D5B2] pb-1">
@@ -96,7 +96,7 @@ export function Portal() {
             <p className="text-[#95D5B2] font-semibold tracking-wider text-sm uppercase mb-3">Tekrar Hoş Geldiniz</p>
             <h1 className="text-4xl sm:text-5xl font-serif font-bold mb-4 leading-tight">Merhaba, {ownerName}</h1>
             <p className="text-gray-300 text-lg max-w-xl leading-relaxed">
-              BulutVet Müşteri Portalı'ndan can dostlarınızın sağlık durumunu takip edebilir, raporlarınızı görüntüleyebilir ve hızlıca randevu alabilirsiniz.
+              CanVet Müşteri Portalı'ndan can dostlarınızın sağlık durumunu takip edebilir, raporlarınızı görüntüleyebilir ve hızlıca randevu alabilirsiniz.
             </p>
           </div>
           

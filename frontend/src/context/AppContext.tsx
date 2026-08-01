@@ -103,9 +103,9 @@ export function honorific(gender?: 'bayan' | 'bay'): string {
 }
 
 const DEFAULT_SETTINGS: SettingsData = {
-  clinicName: 'BulutVet Premium Klinik',
+  clinicName: 'CanVet Premium Klinik',
   phone: '0555 123 45 67',
-  email: 'info@bulutvet.com',
+  email: 'info@canvet.com',
   address: 'Örnek Mah. Pet Cad. No:1',
   taxOffice: 'Kozyatağı',
   taxNo: '1234567890',

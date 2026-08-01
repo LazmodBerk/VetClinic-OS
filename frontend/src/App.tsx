@@ -191,7 +191,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
                 Dr
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-white line-clamp-1">{settings.clinicName}</p>
+                <p className="text-sm font-medium text-white line-clamp-1">{session?.user?.user_metadata?.full_name || settings.clinicName}</p>
                 <p className="text-xs text-[#95D5B2]">Klinik Yöneticisi</p>
               </div>
             </div>
@@ -199,8 +199,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             {isProfileMenuOpen && (
               <div className="absolute bottom-full left-0 mb-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-bottom-2">
                 <div className="px-4 py-2 border-b border-gray-100 mb-1">
-                  <p className="text-sm font-semibold text-gray-900 line-clamp-1">{settings.clinicName}</p>
-                  <p className="text-xs text-gray-500">{settings.email}</p>
+                  <p className="text-sm font-semibold text-gray-900 line-clamp-1">{session?.user?.user_metadata?.full_name || settings.clinicName}</p>
+                  <p className="text-xs text-gray-500">{session?.user?.email || settings.email}</p>
                 </div>
                 <button onClick={() => { setIsProfileMenuOpen(false); navigate('/settings'); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
                   <User className="h-4 w-4" />
