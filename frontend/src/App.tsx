@@ -42,7 +42,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { theme, toggleTheme, settings, inventoryItems, vaccines } = useAppContext();
+  const { theme, toggleTheme, settings, inventoryItems, vaccines, appointments } = useAppContext();
   
   // Local Notifications Setup
   useEffect(() => {
@@ -138,9 +138,19 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         read: false
       });
     });
+    // Bekleyen Randevu Talepleri
+    const pendingAppointments = appointments.filter(a => a.status === 'Onay Bekliyor');
+    pendingAppointments.forEach(a => {
+      dynamicNotifs.push({
+        id: idCounter++,
+        text: `${a.patient} için yeni randevu talebi (${a.date} - ${a.time})`,
+        time: 'Şimdi',
+        read: false
+      });
+    });
 
     setNotifications(dynamicNotifs);
-  }, [inventoryItems, vaccines]);
+  }, [inventoryItems, vaccines, appointments]);
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 

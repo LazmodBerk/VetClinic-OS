@@ -190,7 +190,7 @@ export function Appointments() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto min-h-[350px] pb-12">
           <table className="min-w-full divide-y divide-gray-100 dark:divide-slate-700">
             <thead className="bg-slate-50/50 dark:bg-slate-900/30">
               <tr>
