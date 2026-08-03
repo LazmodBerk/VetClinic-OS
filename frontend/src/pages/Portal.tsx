@@ -90,7 +90,17 @@ export function Portal() {
 
     setIsSaving(true);
     try {
-      // Portal modunda doğrudan Supabase'e yaz (user_id olmadan)
+      // Tarayıcıdaki klinik oturumunun user_id'sini al (RLS politikası için gerekli)
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      if (!userId) {
+        // Oturum yoksa: kullanıcıyı bilgilendir, klinikten portal açması gerektiğini söyle
+        toast.error('Randevu talebi göndermek için klinik yönetim sisteminden portala giriş yapılmalıdır.');
+        setIsSaving(false);
+        return;
+      }
+
       const payload = {
         patient: appointmentForm.patient,
         owner: loggedInOwner!,
@@ -99,9 +109,12 @@ export function Portal() {
         time: appointmentForm.time,
         status: 'Onay Bekliyor',
         color: 'bg-amber-100 text-amber-800',
+        user_id: userId,
       };
+
       const { error } = await supabase.from('appointments').insert([payload]);
       if (error) throw new Error(error.message);
+
       toast.success('✅ Randevu talebiniz kliniğe iletildi! Onay bekleniyor.');
       setIsAppointmentModalOpen(false);
       setAppointmentForm({ patient: '', date: '', time: '', type: 'Muayene' });
