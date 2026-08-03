@@ -15,25 +15,33 @@ export function Accounting() {
   const [method, setMethod] = useState('Kredi Kartı');
   const [eInvoice, setEInvoice] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description || !amount) {
       toast.error('Lütfen zorunlu alanları doldurun.');
       return;
     }
     
-    addTransaction({
-      date: new Date().toLocaleDateString('tr-TR'),
-      description,
-      type,
-      amount: type === 'income' ? `+₺${amount}` : `-₺${amount}`,
-      method,
-      eInvoice
-    });
-    
-    toast.success('İşlem başarıyla kaydedildi!');
-    setIsModalOpen(false);
-    setDescription(''); setAmount(''); setType('income'); setMethod('Kredi Kartı'); setEInvoice(false);
+    setIsSaving(true);
+    try {
+      await addTransaction({
+        date: new Date().toLocaleDateString('tr-TR'),
+        description,
+        type,
+        amount: type === 'income' ? `+₺${amount}` : `-₺${amount}`,
+        method,
+        eInvoice
+      });
+      toast.success('İşlem başarıyla kaydedildi!');
+      setIsModalOpen(false);
+      setDescription(''); setAmount(''); setType('income'); setMethod('Kredi Kartı'); setEInvoice(false);
+    } catch (err: any) {
+      toast.error(err.message || 'İşlem kaydedilemedi, lütfen tekrar deneyin.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const exportCsv = () => {
@@ -234,7 +242,7 @@ export function Accounting() {
           </div>
           <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">
             <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50">İptal</button>
-            <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-[#1B4332] rounded-xl hover:bg-[#122c21] shadow-sm shadow-[#1B4332]/30">İşlemi Kaydet</button>
+            <button type="submit" disabled={isSaving} className="px-4 py-2 text-sm font-medium text-white bg-[#1B4332] rounded-xl hover:bg-[#122c21] shadow-sm shadow-[#1B4332]/30 disabled:opacity-60 disabled:cursor-not-allowed">{isSaving ? 'Kaydediliyor...' : 'İşlemi Kaydet'}</button>
           </div>
         </form>
       </Modal>
