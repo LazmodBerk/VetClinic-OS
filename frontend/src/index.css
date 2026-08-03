@@ -38,33 +38,33 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
 
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 0 0% 16%;
+    --input: 0 0% 10%;
+    --ring: 0 0% 85%;
   }
 }
 
@@ -77,107 +77,117 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* ─── Global Dark Mode Overrides ─────────────────────────────────── */
+  /* ─── Global Dark Mode Overrides (Siyah Tema) ────────────────────── */
 
-  /* Backgrounds */
+  /* Backgrounds: white → near-black */
   .dark .bg-white {
-    @apply bg-slate-800 !important;
+    background-color: #111111 !important;
   }
   .dark .bg-gray-50 {
-    @apply bg-slate-800/60 !important;
+    background-color: #0d0d0d !important;
   }
   .dark .bg-gray-100 {
-    @apply bg-slate-700 !important;
+    background-color: #1a1a1a !important;
   }
   .dark .bg-slate-50\/50,
   .dark .bg-slate-50\/30 {
-    @apply bg-slate-900/50 !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
   }
   .dark .bg-\[#F8F9FA\] {
-    @apply bg-slate-900 !important;
+    background-color: #000000 !important;
   }
 
-  /* Text Colors */
+  /* Text: grays → whites */
   .dark .text-gray-900 {
-    @apply text-slate-100 !important;
+    color: #ffffff !important;
   }
   .dark .text-gray-800 {
-    @apply text-slate-200 !important;
+    color: #f0f0f0 !important;
   }
   .dark .text-gray-700 {
-    @apply text-slate-300 !important;
+    color: #e0e0e0 !important;
   }
   .dark .text-gray-600 {
-    @apply text-slate-300 !important;
+    color: #d0d0d0 !important;
   }
   .dark .text-gray-500 {
-    @apply text-slate-400 !important;
+    color: #aaaaaa !important;
   }
   .dark .text-gray-400 {
-    @apply text-slate-500 !important;
+    color: #888888 !important;
   }
 
   /* Borders */
   .dark .border-gray-50,
   .dark .border-gray-100 {
-    @apply border-slate-700/50 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
   }
   .dark .border-gray-200 {
-    @apply border-slate-700 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
   }
   .dark .border-gray-300 {
-    @apply border-slate-600 !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
   }
 
   /* Inputs, Selects, Textareas */
   .dark input:not([type="checkbox"]):not([type="radio"]),
   .dark textarea,
   .dark select {
-    @apply bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-500 !important;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #666666 !important;
   }
 
-  /* Table Headers */
+  /* Table */
   .dark table th {
-    @apply text-slate-400 !important;
+    color: #888888 !important;
   }
-
-  /* Table Rows */
   .dark table td {
-    @apply text-slate-300 !important;
+    color: #e0e0e0 !important;
+  }
+  .dark tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+  }
+  .dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgba(255, 255, 255, 0.06) !important;
   }
 
   /* Labels */
   .dark label {
-    @apply text-slate-300 !important;
+    color: #d0d0d0 !important;
   }
 
-  /* Cards & Panels */
+  /* Shadows in dark mode */
   .dark .shadow-gray-200\/40 {
-    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.3) !important;
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.6) !important;
   }
 
-  /* Hover states on table rows */
+  /* Hover states */
   .dark .hover\:bg-gray-50:hover {
-    @apply bg-slate-700/40 !important;
+    background-color: rgba(255, 255, 255, 0.04) !important;
+  }
+  .dark .hover\:bg-gray-100:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
   }
 
-  /* Dividers */
-  .dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
-    @apply border-slate-700 !important;
-  }
-
-  /* Notifications panel */
-  .dark .border-gray-50 {
-    @apply border-slate-700/30 !important;
-  }
-
-  /* Datalist / custom scrollbar */
+  /* Scrollbar dark */
   .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #333333;
+  }
+
+  /* Notification panel & dropdown */
+  .dark .bg-white.rounded-2xl,
+  .dark .bg-white.rounded-xl {
+    background-color: #111111 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
   }
 }
 
-/* Custom Scrollbar */
+/* ─── Custom Scrollbar ─────────────────────────────────────────────── */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }

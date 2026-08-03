@@ -170,7 +170,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className={`flex h-screen ${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-[#F8F9FA]'} font-sans selection:bg-[#95D5B2] selection:text-[#1B4332] transition-colors duration-300`}>
+    <div className={`flex h-screen ${theme === 'dark' ? 'bg-black text-white' : 'bg-[#F8F9FA]'} font-sans selection:bg-[#95D5B2] selection:text-[#1B4332] transition-colors duration-300`}>
       <Toaster position="top-center" richColors theme={theme} />
       
       {/* Mobile Sidebar Overlay */}
@@ -260,7 +260,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col overflow-hidden">
         
         {/* Global Top Bar (Mobile Menu Toggle + Global Actions) */}
-        <header className="flex h-16 items-center justify-between border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 sm:px-6 lg:px-8 transition-colors">
+        <header className="flex h-16 items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 sm:px-6 lg:px-8 transition-colors">
           <div className="flex items-center md:hidden">
             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 -ml-2 text-gray-500 dark:text-gray-400 mr-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
               <Menu className="h-6 w-6" />
@@ -356,7 +356,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-gray-50/30 dark:bg-slate-900/50 transition-colors">
+        <main className="flex-1 overflow-y-auto bg-gray-50/30 dark:bg-black transition-colors">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 h-full">
             {children}
           </div>

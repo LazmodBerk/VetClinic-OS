@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar as CalendarIcon, Clock, PawPrint, Smartphone, LogOut, CheckCircle2, Download, Syringe, Plus, Video, PhoneOff, Mic, Camera, FileText } from 'lucide-react';
-import { toast } from 'sonner';
+import { Calendar as CalendarIcon, Clock, PawPrint, LogOut, CheckCircle2, Download, Syringe, Plus, Video, PhoneOff, Mic, Camera, FileText } from 'lucide-react';
+import { toast, Toaster } from 'sonner';
 import { useAppContext } from '../context/AppContext';
+import { supabase } from '../lib/supabase';
 import { Modal } from '../components/Modal';
 
 export function Portal() {
@@ -37,6 +38,7 @@ export function Portal() {
   if (!loggedInOwner) {
     return (
       <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center p-4 selection:bg-[#95D5B2] selection:text-[#1B4332]">
+        <Toaster position="top-center" richColors />
         <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 animate-in zoom-in-95 duration-500">
           <div className="flex flex-col items-center text-center mb-8">
             <div className="h-16 w-16 bg-[#1B4332] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-[#1B4332]/30">
@@ -77,6 +79,10 @@ export function Portal() {
 
   const handleBookAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!appointmentForm.patient) {
+      toast.error('Lütfen evcil hayvanınızı seçin.');
+      return;
+    }
     if (!appointmentForm.date || !appointmentForm.time) {
       toast.error('Lütfen tarih ve saat seçin.');
       return;
@@ -84,20 +90,23 @@ export function Portal() {
 
     setIsSaving(true);
     try {
-      await addAppointment({
+      // Portal modunda doğrudan Supabase'e yaz (user_id olmadan)
+      const payload = {
         patient: appointmentForm.patient,
         owner: loggedInOwner!,
         type: appointmentForm.type,
         date: appointmentForm.date,
         time: appointmentForm.time,
         status: 'Onay Bekliyor',
-        color: 'bg-amber-100 text-amber-800'
-      }, true); // portalMode = true: user_id olmadan çalışır
-      toast.success('Randevu talebiniz kliniğe iletildi! Onay bekleniyor.');
+        color: 'bg-amber-100 text-amber-800',
+      };
+      const { error } = await supabase.from('appointments').insert([payload]);
+      if (error) throw new Error(error.message);
+      toast.success('✅ Randevu talebiniz kliniğe iletildi! Onay bekleniyor.');
       setIsAppointmentModalOpen(false);
       setAppointmentForm({ patient: '', date: '', time: '', type: 'Muayene' });
     } catch (err: any) {
-      toast.error(err.message || 'Randevu gönderilemedi, lütfen tekrar deneyin.');
+      toast.error('Hata: ' + (err.message || 'Randevu gönderilemedi, lütfen tekrar deneyin.'));
     } finally {
       setIsSaving(false);
     }
@@ -121,6 +130,7 @@ export function Portal() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex flex-col font-sans selection:bg-[#95D5B2] selection:text-[#1B4332]">
+      <Toaster position="top-center" richColors />
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
