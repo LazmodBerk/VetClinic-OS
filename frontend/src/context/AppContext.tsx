@@ -41,6 +41,8 @@ export interface Appointment {
   type: string;
   status: string;
   color?: string;
+  notes?: string;
+  user_id?: string;
 }
 
 export interface Vaccine {
@@ -122,7 +124,8 @@ interface AppContextType {
   deletePatient: (id: string | number) => void;
 
   appointments: Appointment[];
-  addAppointment: (appointment: Omit<Appointment, 'id'>) => void;
+  addAppointment: (appointment: Omit<Appointment, 'id'>, portalMode?: boolean) => Promise<void>;
+  updateAppointmentStatus: (id: string | number, status: string) => Promise<void>;
 
   vaccines: Vaccine[];
   addVaccine: (vaccine: Omit<Vaccine, 'id'>) => void;
@@ -301,12 +304,33 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
     setPatients(prev => prev.filter(p => p.id !== id));
   };
 
-  const addAppointment = async (a: Omit<Appointment, 'id'>) => {
-    const userId = getUserId(); 
-    if (!userId) throw new Error('Oturum süresi dolmuş.');
-    const { data, error } = await supabase.from('appointments').insert([{ ...a, user_id: userId }]).select().single();
+  const addAppointment = async (a: Omit<Appointment, 'id'>, portalMode = false) => {
+    const userId = getUserId();
+    if (!portalMode && !userId) throw new Error('Oturum süresi dolmuş.');
+    const payload = portalMode
+      ? { ...a, user_id: userId ?? undefined }
+      : { ...a, user_id: userId! };
+    const { data, error } = await supabase.from('appointments').insert([payload]).select().single();
     if (error) throw new Error(error.message);
     if (data) setAppointments(prev => [data, ...prev]);
+  };
+
+  const updateAppointmentStatus = async (id: string | number, status: string) => {
+    const colorMap: Record<string, string> = {
+      'Onaylandı': 'bg-indigo-100 text-indigo-800',
+      'İptal': 'bg-red-100 text-red-800',
+      'Tamamlandı': 'bg-green-100 text-green-800',
+      'Bekliyor': 'bg-blue-100 text-blue-800',
+    };
+    const color = colorMap[status] ?? 'bg-gray-100 text-gray-700';
+    const { data, error } = await supabase
+      .from('appointments')
+      .update({ status, color })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    if (data) setAppointments(prev => prev.map(apt => apt.id === id ? { ...apt, status, color } : apt));
   };
 
   const addVaccine = async (v: Omit<Vaccine, 'id'>) => {
@@ -409,7 +433,7 @@ export function AppProvider({ children, session }: { children: ReactNode, sessio
   return (
     <AppContext.Provider value={{
       patients, addPatient, updatePatient, deletePatient,
-      appointments, addAppointment,
+      appointments, addAppointment, updateAppointmentStatus,
       vaccines, addVaccine, updateVaccine, deleteVaccine,
       inventoryItems, addInventoryItem, updateInventoryItem, deleteInventoryItem,
       transactions, addTransaction,

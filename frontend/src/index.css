@@ -77,10 +77,27 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Global Dark Mode Overrides for Hardcoded Tailwind Classes */
+  /* ─── Global Dark Mode Overrides ─────────────────────────────────── */
+
+  /* Backgrounds */
   .dark .bg-white {
-    @apply bg-slate-800 border-slate-700 !important;
+    @apply bg-slate-800 !important;
   }
+  .dark .bg-gray-50 {
+    @apply bg-slate-800/60 !important;
+  }
+  .dark .bg-gray-100 {
+    @apply bg-slate-700 !important;
+  }
+  .dark .bg-slate-50\/50,
+  .dark .bg-slate-50\/30 {
+    @apply bg-slate-900/50 !important;
+  }
+  .dark .bg-\[#F8F9FA\] {
+    @apply bg-slate-900 !important;
+  }
+
+  /* Text Colors */
   .dark .text-gray-900 {
     @apply text-slate-100 !important;
   }
@@ -96,13 +113,13 @@
   .dark .text-gray-500 {
     @apply text-slate-400 !important;
   }
-  .dark .bg-gray-50 {
-    @apply bg-slate-800/50 !important;
+  .dark .text-gray-400 {
+    @apply text-slate-500 !important;
   }
-  .dark .bg-slate-50\/50, .dark .bg-slate-50\/30 {
-    @apply bg-slate-900/50 !important;
-  }
-  .dark .border-gray-50, .dark .border-gray-100 {
+
+  /* Borders */
+  .dark .border-gray-50,
+  .dark .border-gray-100 {
     @apply border-slate-700/50 !important;
   }
   .dark .border-gray-200 {
@@ -111,10 +128,63 @@
   .dark .border-gray-300 {
     @apply border-slate-600 !important;
   }
-  .dark input, .dark textarea, .dark select {
-    @apply bg-slate-800 text-white border-slate-600 !important;
+
+  /* Inputs, Selects, Textareas */
+  .dark input:not([type="checkbox"]):not([type="radio"]),
+  .dark textarea,
+  .dark select {
+    @apply bg-slate-800 text-slate-100 border-slate-600 placeholder:text-slate-500 !important;
   }
+
+  /* Table Headers */
   .dark table th {
     @apply text-slate-400 !important;
   }
+
+  /* Table Rows */
+  .dark table td {
+    @apply text-slate-300 !important;
+  }
+
+  /* Labels */
+  .dark label {
+    @apply text-slate-300 !important;
+  }
+
+  /* Cards & Panels */
+  .dark .shadow-gray-200\/40 {
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.3) !important;
+  }
+
+  /* Hover states on table rows */
+  .dark .hover\:bg-gray-50:hover {
+    @apply bg-slate-700/40 !important;
+  }
+
+  /* Dividers */
+  .dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+    @apply border-slate-700 !important;
+  }
+
+  /* Notifications panel */
+  .dark .border-gray-50 {
+    @apply border-slate-700/30 !important;
+  }
+
+  /* Datalist / custom scrollbar */
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #334155;
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 99px;
 }

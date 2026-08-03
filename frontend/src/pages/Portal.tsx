@@ -92,8 +92,8 @@ export function Portal() {
         time: appointmentForm.time,
         status: 'Onay Bekliyor',
         color: 'bg-amber-100 text-amber-800'
-      });
-      toast.success('Randevu talebiniz kliniğe iletildi.');
+      }, true); // portalMode = true: user_id olmadan çalışır
+      toast.success('Randevu talebiniz kliniğe iletildi! Onay bekleniyor.');
       setIsAppointmentModalOpen(false);
       setAppointmentForm({ patient: '', date: '', time: '', type: 'Muayene' });
     } catch (err: any) {
@@ -266,28 +266,46 @@ export function Portal() {
               </div>
             </div>
 
-            {/* Yaklaşan Randevu */}
-            {myAppointments.length > 0 && (
-              <div className="bg-gradient-to-br from-[#E07A5F] to-[#c76045] rounded-3xl shadow-xl shadow-[#E07A5F]/20 p-8 text-center text-white relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                <div className="relative z-10">
-                  <div className="mx-auto h-16 w-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/30 shadow-inner">
-                    <CalendarIcon className="h-8 w-8 text-white" />
+            {/* Randevu Talepleri ve Yaklaşan Randevular */}
+            {myAppointments.length > 0 && (() => {
+              const pendingApts = myAppointments.filter(a => a.status === 'Onay Bekliyor');
+              const confirmedApts = myAppointments.filter(a => a.status !== 'Onay Bekliyor' && a.status !== 'İptal');
+              const nextApt = confirmedApts[0] ?? pendingApts[0];
+              if (!nextApt) return null;
+              const isPending = nextApt.status === 'Onay Bekliyor';
+              return (
+                <div className={`rounded-3xl shadow-xl p-8 text-center text-white relative overflow-hidden ${
+                  isPending
+                    ? 'bg-gradient-to-br from-amber-500 to-amber-600 shadow-amber-500/20'
+                    : 'bg-gradient-to-br from-[#E07A5F] to-[#c76045] shadow-[#E07A5F]/20'
+                }`}>
+                  <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                  <div className="relative z-10">
+                    <div className="mx-auto h-16 w-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/30 shadow-inner">
+                      <CalendarIcon className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="font-serif font-bold text-xl mb-1">
+                      {isPending ? 'Onay Bekleyen Talep' : 'Yaklaşan Randevu'}
+                    </h3>
+                    {isPending && (
+                      <span className="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 border border-white/30">
+                        ⏳ Klinik onayı bekleniyor
+                      </span>
+                    )}
+                    <p className="text-white/80 text-sm font-medium mb-6">{nextApt.patient} - {nextApt.type}</p>
+                    
+                    <div className="bg-white/10 backdrop-blur-md rounded-2xl py-4 px-4 border border-white/20 shadow-inner mb-6">
+                      <p className="text-2xl font-bold">{nextApt.date}</p>
+                      <p className="text-sm font-medium text-[#1B4332] bg-[#95D5B2] inline-block px-3 py-1 rounded-full mt-2">Saat {nextApt.time}</p>
+                    </div>
+                    
+                    <button onClick={() => cancelAppointment(nextApt.id)} className="block w-full py-3 bg-white/10 text-white font-bold rounded-xl border border-white/20 hover:bg-red-500 hover:border-red-500 transition-colors">
+                      İptal Talebi Gönder
+                    </button>
                   </div>
-                  <h3 className="font-serif font-bold text-xl mb-1">Yaklaşan Randevu</h3>
-                  <p className="text-white/80 text-sm font-medium mb-6">{myAppointments[0].patient} - {myAppointments[0].type}</p>
-                  
-                  <div className="bg-white/10 backdrop-blur-md rounded-2xl py-4 px-4 border border-white/20 shadow-inner mb-6">
-                    <p className="text-2xl font-bold">{myAppointments[0].date}</p>
-                    <p className="text-sm font-medium text-[#1B4332] bg-[#95D5B2] inline-block px-3 py-1 rounded-full mt-2">Saat {myAppointments[0].time}</p>
-                  </div>
-                  
-                  <button onClick={() => cancelAppointment(myAppointments[0].id)} className="block w-full py-3 bg-white/10 text-white font-bold rounded-xl border border-white/20 hover:bg-red-500 hover:border-red-500 transition-colors">
-                    İptal Et
-                  </button>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       </main>
