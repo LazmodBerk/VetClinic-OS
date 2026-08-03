@@ -30,6 +30,7 @@ export function Portal() {
     time: '',
     type: 'Muayene'
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   const uniqueOwners = Array.from(new Set(patients.map(p => p.owner))).filter(Boolean);
 
@@ -74,25 +75,32 @@ export function Portal() {
     );
   }
 
-  const handleBookAppointment = (e: React.FormEvent) => {
+  const handleBookAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!appointmentForm.date || !appointmentForm.time) {
       toast.error('Lütfen tarih ve saat seçin.');
       return;
     }
 
-    addAppointment({
-      patient: appointmentForm.patient,
-      owner: loggedInOwner,
-      type: appointmentForm.type,
-      date: appointmentForm.date,
-      time: appointmentForm.time,
-      status: 'Onay Bekliyor',
-      color: 'bg-amber-100 text-amber-800'
-    });
-
-    toast.success('Randevu talebiniz kliniğe iletildi.');
-    setIsAppointmentModalOpen(false);
+    setIsSaving(true);
+    try {
+      await addAppointment({
+        patient: appointmentForm.patient,
+        owner: loggedInOwner!,
+        type: appointmentForm.type,
+        date: appointmentForm.date,
+        time: appointmentForm.time,
+        status: 'Onay Bekliyor',
+        color: 'bg-amber-100 text-amber-800'
+      });
+      toast.success('Randevu talebiniz kliniğe iletildi.');
+      setIsAppointmentModalOpen(false);
+      setAppointmentForm({ patient: '', date: '', time: '', type: 'Muayene' });
+    } catch (err: any) {
+      toast.error(err.message || 'Randevu gönderilemedi, lütfen tekrar deneyin.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const cancelAppointment = (id: number | string) => {
@@ -346,9 +354,10 @@ export function Portal() {
             </button>
             <button
               type="submit"
-              className="px-6 py-3 text-sm font-bold text-white bg-[#1B4332] rounded-xl hover:bg-[#122c21] transition-colors shadow-lg shadow-[#1B4332]/20"
+              disabled={isSaving}
+              className="px-6 py-3 text-sm font-bold text-white bg-[#1B4332] rounded-xl hover:bg-[#122c21] transition-colors shadow-lg shadow-[#1B4332]/20 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Randevu Talebi Gönder
+              {isSaving ? 'Gönderiliyor...' : 'Randevu Talebi Gönder'}
             </button>
           </div>
         </form>
