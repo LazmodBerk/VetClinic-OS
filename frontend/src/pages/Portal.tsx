@@ -37,14 +37,14 @@ export function Portal() {
 
   if (!loggedInOwner) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center p-4 selection:bg-[#95D5B2] selection:text-[#1B4332]">
+      <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center p-4 selection:bg-[#95D5B2] selection:text-[#1B4332] dark:text-emerald-400">
         <Toaster position="top-center" richColors />
         <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 animate-in zoom-in-95 duration-500">
           <div className="flex flex-col items-center text-center mb-8">
             <div className="h-16 w-16 bg-[#1B4332] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-[#1B4332]/30">
               <span className="text-white font-serif font-bold text-3xl">B</span>
             </div>
-            <h1 className="text-3xl font-serif font-bold text-[#1B4332]">CanVet Portal</h1>
+            <h1 className="text-3xl font-serif font-bold text-[#1B4332] dark:text-emerald-400">CanVet Portal</h1>
             <p className="text-gray-500 mt-2 text-sm">Hayvanınızın sağlık verilerine erişmek için lütfen profilinizi seçin.</p>
           </div>
           
@@ -59,11 +59,11 @@ export function Portal() {
                   }}
                   className="w-full text-left flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:border-[#95D5B2] hover:bg-[#95D5B2]/10 transition-all group"
                 >
-                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-[#1B4332] group-hover:bg-[#1B4332] group-hover:text-white transition-colors">
+                  <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-[#1B4332] dark:text-emerald-400 group-hover:bg-[#1B4332] group-hover:text-white transition-colors">
                     <LogOut className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900 group-hover:text-[#1B4332] transition-colors">{owner}</p>
+                    <p className="font-bold text-gray-900 group-hover:text-[#1B4332] dark:text-emerald-400 transition-colors">{owner}</p>
                     <p className="text-xs text-gray-500">{patients.filter(p => p.owner === owner).length} Kayıtlı Hayvan</p>
                   </div>
                 </button>
@@ -142,19 +142,19 @@ export function Portal() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] flex flex-col font-sans selection:bg-[#95D5B2] selection:text-[#1B4332]">
+    <div className="min-h-screen bg-[#F8F9FA] flex flex-col font-sans selection:bg-[#95D5B2] selection:text-[#1B4332] dark:text-emerald-400">
       <Toaster position="top-center" richColors />
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-[#1B4332] rounded-none flex items-center justify-center">
               <span className="text-white font-serif font-bold text-xl">B</span>
             </div>
-            <span className="text-2xl font-serif font-bold text-[#1B4332]">CanVet.</span>
+            <span className="text-2xl font-serif font-bold text-[#1B4332] dark:text-emerald-400">CanVet.</span>
             <span className="ml-4 pl-4 border-l border-gray-300 text-sm font-medium text-gray-500 hidden sm:block">Hasta Portalı</span>
           </div>
-          <button onClick={() => { setLoggedInOwner(null); toast.success('Başarıyla çıkış yapıldı.'); navigate('/'); }} className="flex items-center text-sm font-bold text-[#1B4332] hover:text-[#2a5a45] transition-colors border-b-2 border-transparent hover:border-[#95D5B2] pb-1">
+          <button onClick={() => { setLoggedInOwner(null); toast.success('Başarıyla çıkış yapıldı.'); navigate('/'); }} className="flex items-center text-sm font-bold text-[#1B4332] dark:text-emerald-400 hover:text-[#2a5a45] transition-colors border-b-2 border-transparent hover:border-[#95D5B2] pb-1">
             <LogOut className="h-4 w-4 mr-1.5" />
             Çıkış Yap
           </button>
@@ -190,9 +190,9 @@ export function Portal() {
             
             {/* Dostlarım Card */}
             <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 p-8">
-              <h2 className="text-xl font-serif font-bold text-[#1B4332] mb-6 flex items-center gap-3">
+              <h2 className="text-xl font-serif font-bold text-[#1B4332] dark:text-emerald-400 mb-6 flex items-center gap-3">
                 <div className="p-2.5 bg-[#95D5B2]/20 rounded-xl">
-                  <PawPrint className="h-5 w-5 text-[#1B4332]" />
+                  <PawPrint className="h-5 w-5 text-[#1B4332] dark:text-emerald-400" />
                 </div>
                 Dostlarım
               </h2>
@@ -207,16 +207,16 @@ export function Portal() {
                         <span>{pet.species === 'Köpek' ? '🐕' : pet.species === 'Kedi' ? '🐈' : '🦜'}</span>
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#1B4332] transition-colors">{pet.name}</h3>
+                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#1B4332] dark:text-emerald-400 transition-colors">{pet.name}</h3>
                         <p className="text-xs font-medium text-gray-500 mt-0.5">{pet.species} • {pet.breed}</p>
                       </div>
                     </div>
                     <div className="mt-4 flex items-center justify-between relative z-10">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${pet.status === 'Sağlıklı' ? 'bg-[#95D5B2]/20 text-[#1B4332]' : 'bg-amber-100 text-amber-800'}`}>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${pet.status === 'Sağlıklı' ? 'bg-[#95D5B2]/20 text-[#1B4332] dark:text-emerald-400' : 'bg-amber-100 text-amber-800'}`}>
                         {pet.status === 'Sağlıklı' ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />} 
                         {pet.status}
                       </span>
-                      <span className="text-xs font-bold text-[#1B4332] opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-xs font-bold text-[#1B4332] dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
                         Detay &rarr;
                       </span>
                     </div>
@@ -230,19 +230,19 @@ export function Portal() {
             {/* Karneler ve Raporlar */}
             <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 p-8">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-serif font-bold text-[#1B4332] flex items-center gap-3">
+                <h2 className="text-xl font-serif font-bold text-[#1B4332] dark:text-emerald-400 flex items-center gap-3">
                   <div className="p-2.5 bg-[#E07A5F]/10 rounded-xl">
-                    <Syringe className="h-5 w-5 text-[#E07A5F]" />
+                    <Syringe className="h-5 w-5 text-[#E07A5F] dark:text-orange-400" />
                   </div>
                   Karneler ve Raporlar
                 </h2>
-                <button onClick={() => setIsVaccineHistoryModalOpen(true)} className="text-sm font-bold text-[#1B4332] hover:text-[#95D5B2] transition-colors border-b border-transparent hover:border-[#95D5B2]">Tümünü Gör</button>
+                <button onClick={() => setIsVaccineHistoryModalOpen(true)} className="text-sm font-bold text-[#1B4332] dark:text-emerald-400 hover:text-[#95D5B2] transition-colors border-b border-transparent hover:border-[#95D5B2]">Tümünü Gör</button>
               </div>
               <div className="space-y-3">
                 {myVaccines.length > 0 ? myVaccines.map(v => (
                   <div key={v.id} className="p-4 rounded-2xl border border-gray-100 bg-white hover:bg-[#F8F9FA] transition-colors flex justify-between items-center group shadow-sm hover:shadow-md">
                     <div className="flex items-center gap-4">
-                      <div className="bg-[#95D5B2]/20 p-3 rounded-xl text-[#1B4332]">
+                      <div className="bg-[#95D5B2]/20 p-3 rounded-xl text-[#1B4332] dark:text-emerald-400">
                         <Syringe className="h-5 w-5" />
                       </div>
                       <div>
@@ -250,7 +250,7 @@ export function Portal() {
                         <p className="text-xs font-medium text-gray-500 mt-0.5">Tarih: {v.date} • Durum: {v.status}</p>
                       </div>
                     </div>
-                    <button onClick={() => downloadReport(v.id)} className="flex items-center justify-center p-2.5 bg-gray-50 text-[#1B4332] rounded-xl hover:bg-[#1B4332] hover:text-white transition-all group-hover:scale-105 shadow-sm border border-gray-200">
+                    <button onClick={() => downloadReport(v.id)} className="flex items-center justify-center p-2.5 bg-gray-50 text-[#1B4332] dark:text-emerald-400 rounded-xl hover:bg-[#1B4332] hover:text-white transition-all group-hover:scale-105 shadow-sm border border-gray-200">
                       <Download className="h-4 w-4" />
                     </button>
                   </div>
@@ -266,7 +266,7 @@ export function Portal() {
             
             {/* Hızlı İşlemler */}
             <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 p-8">
-              <h3 className="text-lg font-serif font-bold text-[#1B4332] mb-6">Hızlı İşlemler</h3>
+              <h3 className="text-lg font-serif font-bold text-[#1B4332] dark:text-emerald-400 mb-6">Hızlı İşlemler</h3>
               <div className="space-y-4">
                 <button onClick={() => setIsAppointmentModalOpen(true)} className="w-full flex items-center justify-between p-4 rounded-2xl bg-[#1B4332] text-white hover:bg-[#122c21] transition-all group shadow-lg shadow-[#1B4332]/20 hover:-translate-y-1">
                   <div className="flex items-center gap-3">
@@ -278,7 +278,7 @@ export function Portal() {
                   <Plus className="h-5 w-5 text-[#95D5B2]" />
                 </button>
 
-                <button onClick={() => setIsTeleHealthModalOpen(true)} className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border-2 border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332] hover:text-white transition-all group shadow-md hover:shadow-xl hover:-translate-y-1">
+                <button onClick={() => setIsTeleHealthModalOpen(true)} className="w-full flex items-center justify-between p-4 rounded-2xl bg-white border-2 border-[#1B4332] text-[#1B4332] dark:text-emerald-400 hover:bg-[#1B4332] hover:text-white transition-all group shadow-md hover:shadow-xl hover:-translate-y-1">
                   <div className="flex items-center gap-3">
                     <div className="bg-[#1B4332]/10 p-2.5 rounded-xl group-hover:bg-white/20 transition-colors">
                       <Video className="h-5 w-5" />
@@ -319,7 +319,7 @@ export function Portal() {
                     
                     <div className="bg-white/10 backdrop-blur-md rounded-2xl py-4 px-4 border border-white/20 shadow-inner mb-6">
                       <p className="text-2xl font-bold">{nextApt.date}</p>
-                      <p className="text-sm font-medium text-[#1B4332] bg-[#95D5B2] inline-block px-3 py-1 rounded-full mt-2">Saat {nextApt.time}</p>
+                      <p className="text-sm font-medium text-[#1B4332] dark:text-emerald-400 bg-[#95D5B2] inline-block px-3 py-1 rounded-full mt-2">Saat {nextApt.time}</p>
                     </div>
                     
                     <button onClick={() => cancelAppointment(nextApt.id)} className="block w-full py-3 bg-white/10 text-white font-bold rounded-xl border border-white/20 hover:bg-red-500 hover:border-red-500 transition-colors">
@@ -413,7 +413,7 @@ export function Portal() {
                 <span>{selectedPet.species === 'Köpek' ? '🐕' : selectedPet.species === 'Kedi' ? '🐈' : '🦜'}</span>
               </div>
               <div>
-                <h3 className="text-2xl font-serif font-bold text-[#1B4332]">{selectedPet.name}</h3>
+                <h3 className="text-2xl font-serif font-bold text-[#1B4332] dark:text-emerald-400">{selectedPet.name}</h3>
                 <p className="text-gray-500 font-medium mt-1">{selectedPet.species} • {selectedPet.breed}</p>
               </div>
             </div>
@@ -432,13 +432,13 @@ export function Portal() {
                 <span className="font-bold text-lg text-gray-900">DEA 1.1</span>
               </div>
               <div className="bg-white p-4 border border-[#E07A5F]/20 rounded-2xl shadow-sm shadow-gray-200/50 bg-[#E07A5F]/5">
-                <span className="text-[#E07A5F] font-semibold text-xs uppercase tracking-wider block mb-1.5">Alerjiler</span>
-                <span className="font-bold text-lg text-[#E07A5F]">Penisilin</span>
+                <span className="text-[#E07A5F] dark:text-orange-400 font-semibold text-xs uppercase tracking-wider block mb-1.5">Alerjiler</span>
+                <span className="font-bold text-lg text-[#E07A5F] dark:text-orange-400">Penisilin</span>
               </div>
             </div>
 
             <div className="mt-4">
-              <h4 className="font-serif font-bold text-lg text-[#1B4332] mb-3">Beslenme & Diyet</h4>
+              <h4 className="font-serif font-bold text-lg text-[#1B4332] dark:text-emerald-400 mb-3">Beslenme & Diyet</h4>
               <p className="text-sm font-medium text-gray-700 bg-[#95D5B2]/20 p-4 rounded-2xl border border-[#95D5B2]/30 leading-relaxed">
                 Hipoalerjenik kuzu etli yetişkin maması kullanılması tavsiye edilmektedir. Günlük porsiyon: 250gr.
               </p>
@@ -491,14 +491,14 @@ export function Portal() {
             <div key={v.id} className="p-4 border border-gray-100 rounded-2xl bg-white shadow-sm shadow-gray-200/40 flex justify-between items-center group hover:border-[#95D5B2]/50 transition-colors">
               <div className="flex items-center gap-4">
                 <div className="bg-[#F8F9FA] p-3 rounded-xl border border-gray-100">
-                  <Syringe className="h-5 w-5 text-[#1B4332]" />
+                  <Syringe className="h-5 w-5 text-[#1B4332] dark:text-emerald-400" />
                 </div>
                 <div>
-                  <p className="font-bold text-[#1B4332]">{v.patient} - {v.vaccine} Aşısı</p>
-                  <p className="text-xs font-medium text-gray-500 mt-0.5">Tarih: {v.date} • Durum: <span className="font-bold text-[#E07A5F]">{v.status}</span></p>
+                  <p className="font-bold text-[#1B4332] dark:text-emerald-400">{v.patient} - {v.vaccine} Aşısı</p>
+                  <p className="text-xs font-medium text-gray-500 mt-0.5">Tarih: {v.date} • Durum: <span className="font-bold text-[#E07A5F] dark:text-orange-400">{v.status}</span></p>
                 </div>
               </div>
-              <button onClick={() => downloadReport(v.id)} className="p-2.5 bg-gray-50 text-[#1B4332] rounded-xl hover:bg-[#1B4332] hover:text-white transition-all shadow-sm">
+              <button onClick={() => downloadReport(v.id)} className="p-2.5 bg-gray-50 text-[#1B4332] dark:text-emerald-400 rounded-xl hover:bg-[#1B4332] hover:text-white transition-all shadow-sm">
                 <Download className="h-4 w-4" />
               </button>
             </div>
@@ -508,18 +508,18 @@ export function Portal() {
 
           <div className="h-px bg-gray-100 my-6"></div>
           
-          <h4 className="font-serif font-bold text-lg text-[#1B4332] mb-3">Laboratuvar Sonuçları</h4>
+          <h4 className="font-serif font-bold text-lg text-[#1B4332] dark:text-emerald-400 mb-3">Laboratuvar Sonuçları</h4>
           <div className="p-4 border border-gray-100 rounded-2xl bg-white shadow-sm shadow-gray-200/40 flex justify-between items-center group hover:border-[#E07A5F]/50 transition-colors">
             <div className="flex items-center gap-4">
               <div className="bg-[#E07A5F]/10 p-3 rounded-xl border border-[#E07A5F]/10">
-                <FileText className="h-5 w-5 text-[#E07A5F]" />
+                <FileText className="h-5 w-5 text-[#E07A5F] dark:text-orange-400" />
               </div>
               <div>
                 <p className="font-bold text-gray-900">Tam Kan Sayımı (Hemogram)</p>
                 <p className="text-xs font-medium text-gray-500 mt-0.5">12 Ekim 2026 • Tarçın</p>
               </div>
             </div>
-            <button onClick={() => downloadReport(99)} className="p-2.5 bg-gray-50 text-[#1B4332] rounded-xl hover:bg-[#1B4332] hover:text-white transition-all shadow-sm">
+            <button onClick={() => downloadReport(99)} className="p-2.5 bg-gray-50 text-[#1B4332] dark:text-emerald-400 rounded-xl hover:bg-[#1B4332] hover:text-white transition-all shadow-sm">
               <Download className="h-4 w-4" />
             </button>
           </div>
