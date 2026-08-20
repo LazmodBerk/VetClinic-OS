@@ -50,10 +50,10 @@ export function LandingPage() {
               Dostunuzun sağlığı sadece rakamlardan ibaret değildir. Korkularını yatıştıran, ona ismiyle hitap eden ve en zor anlarında bile sizin kadar şefkatli yaklaşan bir ekip.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-[#1B4332] text-white px-8 py-4 rounded-none font-medium hover:bg-[#122c21] transition-colors flex items-center justify-center gap-2">
+              <button onClick={() => document.getElementById('iletisim')?.scrollIntoView({ behavior: 'smooth' })} className="bg-[#1B4332] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#122c21] transition-all shadow-lg shadow-[#1B4332]/15 hover:-translate-y-0.5 flex items-center justify-center gap-2">
                 <Calendar className="h-5 w-5" /> Randevu Alın
               </button>
-              <button className="bg-white text-[#2D3748] border border-gray-200 px-8 py-4 rounded-none font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 group">
+              <button onClick={() => document.getElementById('hizmetler')?.scrollIntoView({ behavior: 'smooth' })} className="bg-white text-[#2D3748] border border-gray-200 px-8 py-4 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-300 transition-all flex items-center justify-center gap-2 group">
                 Kliniğimizi Keşfedin <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -71,8 +71,8 @@ export function LandingPage() {
 
             <div className="aspect-[4/5] lg:aspect-square relative overflow-hidden bg-gray-200">
               <img 
-                src="https://images.unsplash.com/photo-1599443015574-be5fe8c0bf04?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                alt="Veteriner hekim muayenesi" 
+                src="/vet-exam.jpg"
+                alt="Bahçede koşan yavru köpek"
                 className="object-cover w-full h-full"
               />
               <div className="absolute inset-0 bg-[#1B4332]/10 mix-blend-multiply"></div>
@@ -85,7 +85,7 @@ export function LandingPage() {
       </section>
 
       {/* Trust & Stats (No generic 01/02/03 steps, just honest facts) */}
-      <section className="bg-[#1B4332] text-white py-16 px-6">
+      <section className="bg-[#1B4332] text-white py-16 px-6" aria-label="Klinik istatistikleri">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-[#95D5B2]/20">
           <div className="px-4">
             <p className="text-4xl font-serif mb-2 text-[#95D5B2]">12+</p>
@@ -158,7 +158,7 @@ export function LandingPage() {
             </div>
             <div className="relative group mt-12 md:mt-0">
               <div className="aspect-[4/3] overflow-hidden bg-gray-200">
-                <img src="https://images.unsplash.com/photo-1596853220000-84dc24856b3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Dr. Can" className="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-all duration-700" />
+                <img src="/veterinarian-team-2.jpg" alt="Kliniğimizin veteriner hekimlerinden biri" className="object-cover object-center w-full h-full grayscale group-hover:grayscale-0 transition-all duration-700" />
               </div>
               <div className="absolute bottom-0 left-0 bg-white p-6 max-w-[85%] border-t-4 border-[#95D5B2]">
                 <h4 className="font-serif text-xl font-bold text-[#1B4332]">Vet. Hekim Can Demir</h4>
@@ -194,7 +194,7 @@ export function LandingPage() {
             </div>
           </div>
           
-          <div className="bg-white p-8 text-[#2D3748]">
+          <div className="bg-white p-8 text-[#2D3748] rounded-2xl shadow-2xl shadow-black/10">
             <h3 className="font-serif text-2xl font-bold mb-6 text-[#1B4332]">Hızlı Randevu Talebi</h3>
             <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert("Randevu talebiniz alındı."); }}>
               <div>
@@ -205,7 +205,7 @@ export function LandingPage() {
                 <label className="block text-sm font-medium mb-1">Telefon Numaranız</label>
                 <input type="tel" className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-[#1B4332] transition-colors bg-transparent" placeholder="0 (5XX) XXX XX XX" required/>
               </div>
-              <button type="submit" className="w-full bg-[#1B4332] text-white py-4 mt-6 hover:bg-[#122c21] transition-colors font-medium">
+              <button type="submit" className="w-full bg-[#1B4332] text-white py-4 mt-6 hover:bg-[#122c21] transition-colors font-bold rounded-xl shadow-lg shadow-[#1B4332]/15">
                 Talebi Gönder
               </button>
             </form>
@@ -223,7 +223,7 @@ export function LandingPage() {
       </footer>
 
       {/* Signature Element 2: Fixed Emergency / Triage Tag */}
-      <a href="tel:+902125550123" className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-[#E07A5F] text-white py-3 px-5 shadow-2xl hover:bg-[#c96c53] transition-all transform hover:-translate-y-1 group">
+      <a href="tel:+902125550123" aria-label="Acil durum hattını ara" className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl bg-[#E07A5F] text-white py-3 px-5 shadow-2xl hover:bg-[#c96c53] transition-all transform hover:-translate-y-1 group">
         <AlertCircle className="h-5 w-5 animate-pulse" />
         <div className="flex flex-col">
           <span className="text-[10px] uppercase tracking-wider font-bold opacity-90">Acil Durum Hattı</span>

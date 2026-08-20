@@ -1,5 +1,5 @@
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Tractor, Smartphone, Home, CheckCircle2, Clock, Brain, Moon, Sun, Globe, User, LogOut } from 'lucide-react';
+import { LayoutDashboard, Calendar, Syringe, Users, DollarSign, Settings as SettingsIcon, Bell, Package, FileText, Menu, X, MessageSquare, Smartphone, Home, CheckCircle2, Clock, Brain, Moon, Sun, Globe, User, LogOut } from 'lucide-react';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { useState, useRef, useEffect } from 'react';
 import { Dashboard } from './pages/Dashboard';
@@ -25,14 +25,14 @@ import { supabase } from './lib/supabase';
 import type { Session } from '@supabase/supabase-js';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Müşteriler', href: '/patients', icon: Users },
+  { name: 'Genel Bakış', href: '/', icon: LayoutDashboard },
+  { name: 'Hasta Yönetimi', href: '/patients', icon: Users },
   { name: 'Tıbbi Kayıtlar', href: '/reports', icon: FileText },
   { name: 'Aşı Takvimi', href: '/vaccines', icon: Syringe },
   { name: 'Randevular', href: '/appointments', icon: Calendar },
   { name: 'Stok Yönetimi', href: '/inventory', icon: Package },
-  { name: 'Faturalar', href: '/accounting', icon: DollarSign },
-  { name: 'İletişim & SMS', href: '/communication', icon: MessageSquare },
+  { name: 'Finans & Faturalar', href: '/accounting', icon: DollarSign },
+  { name: 'İletişim Merkezi', href: '/communication', icon: MessageSquare },
   { name: 'AI Asistan', href: '/ai-assistant', icon: Brain },
   { name: 'AI İş Zekası', href: '/ai-insights', icon: Brain },
   { name: 'Ayarlar', href: '/settings', icon: SettingsIcon },
@@ -43,6 +43,9 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme, settings, inventoryItems, vaccines, appointments } = useAppContext();
+  const activeNavigation = navigation.find((item) =>
+    item.href === '/' ? location.pathname === '/' : location.pathname.startsWith(item.href),
+  );
   
   // Local Notifications Setup
   useEffect(() => {
@@ -87,7 +90,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         if (pending.length > 0) {
           await LocalNotifications.schedule({ notifications: pending });
         }
-      } catch (e) {
+      } catch {
         console.log('Local notifications unsupported on this platform or denied.');
       }
     };
@@ -180,7 +183,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className={`flex h-screen ${theme === 'dark' ? 'bg-slate-900 text-white' : 'bg-[#F8F9FA]'} font-sans selection:bg-[#95D5B2] selection:text-[#1B4332] transition-colors duration-300`}>
+    <div className={`flex h-screen ${theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-[#f4f7f5]'} font-sans selection:bg-[#95D5B2] selection:text-[#1B4332] transition-colors duration-300`}>
       <Toaster position="top-center" richColors theme={theme} />
       
       {/* Mobile Sidebar Overlay */}
@@ -189,35 +192,39 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* Sidebar for Desktop & Mobile */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 flex-col bg-[#1B4332] border-r border-[#1B4332] transition-transform duration-300 shadow-xl flex md:static md:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex h-16 shrink-0 items-center justify-between px-6 border-b border-[#2a5a45]">
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 flex-col bg-[#153b2d] border-r border-white/[0.06] transition-transform duration-300 shadow-2xl flex md:static md:translate-x-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex h-[72px] shrink-0 items-center justify-between px-5 border-b border-white/[0.07]">
           <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 hover:opacity-90 transition-opacity">
             <div className="h-9 w-9 rounded-xl overflow-hidden shadow-lg ring-2 ring-white/10">
               <Logo className="h-9 w-9" />
             </div>
-            <h1 className="text-xl font-serif font-bold text-white tracking-wide">CanVet</h1>
+            <div>
+              <h1 className="text-lg font-bold text-white tracking-tight">CanVet</h1>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#95D5B2]">Clinic OS</p>
+            </div>
           </Link>
           <button onClick={() => setMobileMenuOpen(false)} className="md:hidden text-white/70 hover:text-white">
             <X className="h-6 w-6" />
           </button>
         </div>
-        <nav className="flex flex-1 flex-col px-4 py-6 overflow-y-auto space-y-1 custom-scrollbar">
+        <nav className="flex flex-1 flex-col px-3 py-5 overflow-y-auto space-y-1 custom-scrollbar" aria-label="Ana menü">
+          <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">Klinik yönetimi</p>
           {navigation.map((item) => {
-            const isActive = location.pathname === item.href;
+            const isActive = item.href === '/' ? location.pathname === '/' : location.pathname.startsWith(item.href);
             return (
               <Link
                 key={item.name}
                 to={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 ${
+                className={`group flex items-center px-3 py-2.5 text-[13px] font-semibold rounded-xl transition-all duration-200 ${
                   isActive
-                    ? 'bg-[#95D5B2]/20 text-[#95D5B2] shadow-inner border border-[#95D5B2]/10'
-                    : 'text-gray-300 hover:bg-[#2a5a45] hover:text-white'
+                    ? 'bg-white/[0.11] text-white shadow-inner border border-white/[0.08]'
+                    : 'text-emerald-50/65 hover:bg-white/[0.06] hover:text-white border border-transparent'
                 }`}
               >
                 <item.icon
                   className={`mr-3 h-5 w-5 flex-shrink-0 transition-colors ${
-                    isActive ? 'text-[#95D5B2]' : 'text-gray-400 group-hover:text-white'
+                    isActive ? 'text-[#95D5B2]' : 'text-emerald-50/45 group-hover:text-white'
                   }`}
                   aria-hidden="true"
                 />
@@ -226,18 +233,18 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-[#2a5a45] bg-[#122c21]/30">
-          <Link to="/portal" target="_blank" className="flex items-center gap-2 w-full justify-center px-4 py-2.5 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 hover:text-[#95D5B2] transition-colors mb-4 border border-white/5 shadow-sm backdrop-blur-sm">
+        <div className="p-3 border-t border-white/[0.07] bg-black/10">
+          <Link to="/portal" target="_blank" className="flex items-center gap-2 w-full justify-center px-4 py-2.5 bg-white/[0.07] text-emerald-50 rounded-xl text-xs font-bold hover:bg-white/[0.12] hover:text-white transition-colors mb-3 border border-white/[0.06]">
             <Smartphone className="h-4 w-4" />
-            Hasta Portalı'nı Aç
+            Hasta portalını görüntüle
           </Link>
           <div className="relative" ref={profileRef}>
             <div 
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#2a5a45] transition-colors cursor-pointer border border-transparent hover:border-[#95D5B2]/20"
+              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/[0.06] transition-colors cursor-pointer border border-transparent hover:border-white/[0.06]"
             >
-              <div className="h-10 w-10 rounded-full bg-[#95D5B2] flex items-center justify-center text-[#1B4332] font-bold shadow-md ring-2 ring-white/10">
-                Dr
+              <div className="h-9 w-9 rounded-xl bg-[#95D5B2] flex items-center justify-center text-[#153b2d] text-xs font-bold shadow-md ring-2 ring-white/10">
+                DR
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-white line-clamp-1">{session?.user?.user_metadata?.full_name || settings.clinicName}</p>
@@ -270,7 +277,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col overflow-hidden">
         
         {/* Global Top Bar (Mobile Menu Toggle + Global Actions) */}
-        <header className="flex h-16 items-center justify-between border-b border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 sm:px-6 lg:px-8 transition-colors">
+        <header className="flex h-[72px] items-center justify-between border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 px-4 sm:px-6 lg:px-8 transition-colors backdrop-blur-xl">
           <div className="flex items-center md:hidden">
             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 -ml-2 text-gray-500 dark:text-gray-400 mr-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
               <Menu className="h-6 w-6" />
@@ -283,14 +290,15 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           
-          <div className="hidden md:block text-sm font-medium text-gray-500">
-            {/* Optional breadcrumbs or empty space */}
+          <div className="hidden md:block">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">CanVet / Klinik</p>
+            <h2 className="mt-0.5 text-sm font-bold text-slate-800 dark:text-slate-100">{activeNavigation?.name || 'Klinik Yönetimi'}</h2>
           </div>
 
           <div className="flex items-center space-x-2 relative" ref={notifRef}>
             <button 
               onClick={() => navigate('/website')} 
-              className="flex items-center justify-center rounded-full p-2 md:px-3 md:py-1.5 bg-white dark:bg-slate-800 text-gray-400 hover:text-[#1B4332] dark:hover:text-[#95D5B2] shadow-sm border border-gray-200 dark:border-slate-700 transition-colors md:text-xs md:font-bold mr-1"
+              className="flex items-center justify-center rounded-xl p-2 md:px-3 md:py-2 bg-white dark:bg-slate-800 text-slate-500 hover:text-[#1B4332] dark:hover:text-[#95D5B2] border border-slate-200 dark:border-slate-700 transition-colors md:text-xs md:font-bold mr-1"
               title="Siteye Git"
             >
               <Globe className="h-5 w-5 md:mr-1.5" aria-hidden="true" />
@@ -298,7 +306,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             </button>
             <button 
               onClick={() => navigate('/')} 
-              className="flex items-center justify-center rounded-full p-2 bg-white dark:bg-slate-800 text-gray-400 hover:text-[#1B4332] dark:hover:text-[#95D5B2] shadow-sm border border-gray-200 dark:border-slate-700 transition-colors"
+              className="flex items-center justify-center rounded-xl p-2 bg-white dark:bg-slate-800 text-slate-500 hover:text-[#1B4332] dark:hover:text-[#95D5B2] border border-slate-200 dark:border-slate-700 transition-colors"
               title="Ana Sayfaya Dön"
             >
               <Home className="h-5 w-5" aria-hidden="true" />
@@ -306,7 +314,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             
             <button 
               onClick={toggleTheme} 
-              className="flex items-center justify-center rounded-full p-2 bg-white dark:bg-slate-800 text-gray-400 hover:text-[#1B4332] dark:hover:text-[#95D5B2] shadow-sm border border-gray-200 dark:border-slate-700 transition-colors"
+              className="flex items-center justify-center rounded-xl p-2 bg-white dark:bg-slate-800 text-slate-500 hover:text-[#1B4332] dark:hover:text-[#95D5B2] border border-slate-200 dark:border-slate-700 transition-colors"
               title="Temayı Değiştir"
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
@@ -314,7 +322,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             
             <button 
               onClick={() => setIsNotifOpen(!isNotifOpen)} 
-              className={`flex items-center justify-center rounded-full p-2 transition-colors relative ${isNotifOpen ? 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200' : 'bg-white dark:bg-slate-800 text-gray-400 hover:text-gray-500 shadow-sm border border-gray-200 dark:border-slate-700'}`}
+              aria-label={`Bildirimler${unreadCount ? `, ${unreadCount} okunmamış` : ''}`}
+              className={`flex items-center justify-center rounded-xl p-2 transition-colors relative ${isNotifOpen ? 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200' : 'bg-white dark:bg-slate-800 text-slate-500 hover:text-[#1B4332] border border-slate-200 dark:border-slate-700'}`}
             >
               <Bell className="h-5 w-5" aria-hidden="true" />
               {unreadCount > 0 && (
@@ -323,7 +332,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             </button>
 
             {isNotifOpen && (
-              <div className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-xl shadow-gray-200/60 border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 top-12 w-[min(22rem,calc(100vw-2rem))] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl shadow-slate-900/10 border border-slate-200 dark:border-slate-700 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                   <h3 className="font-semibold text-gray-900">Bildirimler</h3>
                   {unreadCount > 0 && (
@@ -366,8 +375,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-gray-50/30 dark:bg-slate-900/50 transition-colors">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 h-full">
+        <main className="flex-1 overflow-y-auto bg-[#f4f7f5] dark:bg-slate-950 transition-colors">
+          <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-6 lg:py-8 h-full">
             {children}
           </div>
         </main>
