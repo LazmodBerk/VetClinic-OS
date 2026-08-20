@@ -55,5 +55,5 @@ Proje, sıradan beyaz/mavi klinik yazılımlarından sıyrılıp, güven ve prof
 - **Tipografi:** Başlıklar için `Playfair Display` (Serif), gövde metinleri için `DM Sans` (Sans-serif).
 
 ## 📝 Lisans
-Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır. Dilediğiniz gibi kullanabilir ve geliştirebilirsiniz.
+Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
 
